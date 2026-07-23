@@ -13,5 +13,12 @@ uniform float picScale;
 out vec4 finalColor;
 
 void main() {
-  finalColor = texture(texture0, fragTexCoord * picScale);
+  vec2 normTexCoord = fragTexCoord * picScale;
+  if (normTexCoord.x < 0 || normTexCoord.x > 1 ||
+      normTexCoord.y < 0 || normTexCoord.y > 1) {
+    finalColor = vec4(0, 0, 0, 1);
+  }
+  else {
+    finalColor = texture(texture0, normTexCoord);
+  }
 }

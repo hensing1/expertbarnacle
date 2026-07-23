@@ -44,16 +44,19 @@ int main() {
             // float pictureDims[]  = {image.width, image.height};
             int picScaleLoc = GetShaderLocation(imageShader, "picScale");
             float imgScale = max(
-               (float)image.width / ((float)screenWidth - 100.f),
-               (float)image.height / (float)screenHeight
+               (float)image.width / (screenWidth - 100.f),
+               (float)image.height / screenHeight
             );
             // printf("%f %f\n", imgScale[0], imgScale[1]);
-            SetShaderValue(imageShader, picScaleLoc, &imgScale,
-                            SHADER_UNIFORM_FLOAT);
-            DrawTextureRec(image,
-                           (Rectangle){0, 0, (float)screenWidth - 100,
-                                       (float)screenHeight},
-                           (Vector2){0, 0}, BLACK);
+            SetShaderValue(
+               imageShader, picScaleLoc, &imgScale, SHADER_UNIFORM_FLOAT
+            );
+            DrawTextureRec(
+               image,
+               (Rectangle){0, 0, (float)screenWidth - 100, (float)screenHeight},
+               (Vector2){0, 0},
+               BLACK
+            );
          }
          EndShaderMode();
       }
