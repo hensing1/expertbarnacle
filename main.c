@@ -10,7 +10,7 @@ int main() {
    const int screenWidth  = 800;
    const int screenHeight = 600;
    InitWindow(screenWidth, screenHeight, "guten Morgen");
-   Shader helloShader = LoadShader(0, "shaders/hello.frag");
+   Shader helloShader = LoadShader(0, "./shaders/hello.frag");
    Shader imageShader = LoadShader(0, "./shaders/image.frag");
 
    RenderTexture2D fullscreenRect =

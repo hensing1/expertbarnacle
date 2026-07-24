@@ -1,2 +1,2 @@
 main: main.c
-	clang -fsanitize=address -lraylib main.c -o main
+	clang -g -fsanitize=address -static-libasan -lraylib main.c -o main
