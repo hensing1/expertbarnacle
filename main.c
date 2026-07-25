@@ -1,67 +1,74 @@
-// #define GLSL_VERSION 460
-
 #include "raylib.h"
 #include <stdio.h>
 
-static inline float min(float a, float b) {return a < b ? a : b;}
-static inline float max(float a, float b) {return a > b ? a : b;}
+#include "src/colors.h"
+#include "src/util.c"
 
 int main() {
-   const int screenWidth  = 800;
-   const int screenHeight = 600;
-   InitWindow(screenWidth, screenHeight, "guten Morgen");
-   Shader helloShader = LoadShader(0, "./shaders/hello.frag");
-   Shader imageShader = LoadShader(0, "./shaders/image.frag");
+    const int screenWidth  = 800;
+    const int screenHeight = 600;
+    InitWindow(screenWidth, screenHeight, "guten Morgen");
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
+    SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-   RenderTexture2D fullscreenRect =
-       LoadRenderTexture(screenWidth - 100, screenHeight);
-   Texture2D image = LoadTexture("./res/saft.png");
-   RenderTexture2D imageFrameBuf =
-       LoadRenderTexture(screenWidth - 100, screenHeight);
+    Shader imageShader = LoadShader(0, "src/shaders/image.frag");
+    Texture2D image = LoadTexture("res/saft.png");
+    SetTextureWrap(image, TEXTURE_WRAP_MIRROR_REPEAT);
 
-   printf("image dims: %d x %d\n", image.width, image.height);
+    float imageAspectRatio = (float)image.width / image.height;
 
-   SetTargetFPS(24);
+    float scale = 1;
 
-   while (!WindowShouldClose()) {
-      BeginDrawing();
-      {
-         ClearBackground(RAYWHITE);
-         BeginShaderMode(imageShader);
-         {
-            // NOTE: Render texture must be y-flipped due to default OpenGL
-            // coordinates (left-bottom)
+    while (!WindowShouldClose()) {
+        Vector2 mousePos = GetMousePosition();
+        printf("%f %f\n", mousePos.x, mousePos.y);
+        Vector2 mouse_scroll = GetMouseWheelMoveV();
+        if (mouse_scroll.y < 0) { scale /= 1.15; }
+        else if (mouse_scroll.y > 0) { scale *= 1.15; }
+        scale = max(min(scale, 300), 1);
+        Rectangle imageCrop;
+        imageCrop.width = image.width / scale;
+        imageCrop.height = image.height / scale;
+        imageCrop.x = (image.width - imageCrop.width) / 2;
+        imageCrop.y = (image.height - imageCrop.height) / 2;
 
-            // DrawTextureRec(fullscreenRect.texture,
-            //                (Rectangle){0, 0,
-            //                (float)fullscreenRect.texture.width,
-            //                            (float)-fullscreenRect.texture.height},
-            //                (Vector2){0, 0}, BLACK);
+        Vector2 screenDims = {GetScreenWidth(), GetScreenHeight()};
+        float screenAspectRatio = screenDims.x / screenDims.y;
+        Rectangle imageTarget;
+        imageTarget.x = imageTarget.y = 0;
 
-            // int rectDimsLoc    = GetShaderLocation(imageShader, "rectDims");
-            // int pictureDimsLoc = GetShaderLocation(imageShader, "pictureDims");
-            // float rectDims[]     = {screenWidth - 100, screenHeight};
-            // float pictureDims[]  = {image.width, image.height};
-            int picScaleLoc = GetShaderLocation(imageShader, "picScale");
-            float imgScale = max(
-               (float)image.width / (screenWidth - 100.f),
-               (float)image.height / screenHeight
-            );
-            // printf("%f %f\n", imgScale[0], imgScale[1]);
-            SetShaderValue(
-               imageShader, picScaleLoc, &imgScale, SHADER_UNIFORM_FLOAT
-            );
-            DrawTextureRec(
-               image,
-               (Rectangle){0, 0, (float)screenWidth - 100, (float)screenHeight},
-               (Vector2){0, 0},
-               BLACK
-            );
-         }
-         EndShaderMode();
-      }
-      EndDrawing();
-   }
-   CloseWindow();
-   return 0;
+        if (screenAspectRatio > imageAspectRatio) {  // screen wider than image
+            imageTarget.height = screenDims.y;
+            imageTarget.width = imageTarget.height * imageAspectRatio;
+            imageTarget.x = (screenDims.x - imageTarget.width) / 2;
+        }
+        else {
+            imageTarget.width = screenDims.x;
+            imageTarget.height = screenDims.x / imageAspectRatio;
+            imageTarget.y = (screenDims.y - imageTarget.height) / 2;
+        }
+
+        BeginDrawing();
+        {
+            ClearBackground(SLATE);
+            BeginShaderMode(imageShader);
+            {
+                // SetShaderValue(
+                //     imageShader, picScaleLoc, &imgScale, SHADER_UNIFORM_FLOAT
+                // );
+                DrawTexturePro(
+                    image,
+                    imageCrop,
+                    imageTarget,
+                    (Vector2){0, 0},
+                    0,
+                    RED
+                );
+            }
+            EndShaderMode();
+        }
+        EndDrawing();
+    }
+    CloseWindow();
+    return 0;
 }

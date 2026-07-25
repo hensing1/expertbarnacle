@@ -9,4 +9,4 @@ AlignConsecutiveMacros:
 BraceWrapping:
   BeforeElse: true
 IndentCaseLabels: true
-IndentWidth: 3
+IndentWidth: 4

@@ -3,24 +3,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <math.h>
-
 #include "raylib.h"
 
 #define CLAY_IMPLEMENTATION
-#include "lib/clay.h"
-#include "lib/clay_renderer_raylib.c"
+#include "src/lib/clay.h"
+#include "src/lib/clay_renderer_raylib.c"
+
+#include "src/util.c"
 
 
-#define COLOR_SLATE (Clay_Color){43, 41, 51, 255}
-
-#define CLAY_COLOR_TO_RAYLIB_COLOR(color)                                      \
-    (Color) {                                                                  \
-        .r = (unsigned char)roundf(color.r),                                   \
-        .g = (unsigned char)roundf(color.g),                                   \
-        .b = (unsigned char)roundf(color.b),                                   \
-        .a = (unsigned char)roundf(color.a)                                    \
-    }
 
 static inline Clay_Vector2 raylib_vec2_to_clay_vec2(Vector2 vec2) { return (Clay_Vector2){vec2.x, vec2.y}; }
 
@@ -42,22 +33,27 @@ int main() {
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
+    Shader imageShader = LoadShader(0, "./shaders/image.frag");
+
     Clay_Initialize(arena, (Clay_Dimensions){ init_window_width, init_window_height }, (Clay_ErrorHandler){ handle_clay_errors });
 
     Font fonts[] = {GetFontDefault()};
 
     Texture2D image = LoadTexture("./res/saft.png");
     float ratio = image.width / (float)image.height;
+    float scale = 1.;
 
     while (!WindowShouldClose()) {
         float delta_time = GetFrameTime();
+        Vector2 mouse_scroll = GetMouseWheelMoveV();
+        if (mouse_scroll.y < 0) { scale /= 1.1; }
+        else if (mouse_scroll.y > 0) { scale *= 1.1; }
+        scale = max(scale, 1);
 
         // do clay things
-        if (IsWindowResized()) {
-            Clay_SetLayoutDimensions((Clay_Dimensions){ GetScreenWidth(), GetScreenHeight() });
-        }
+        Clay_SetLayoutDimensions((Clay_Dimensions){ GetScreenWidth(), GetScreenHeight() });
         Clay_SetPointerState((Clay_Vector2){ GetMouseX(), GetMouseY() }, IsMouseButtonPressed(MOUSE_BUTTON_LEFT));
-        Clay_UpdateScrollContainers(true, raylib_vec2_to_clay_vec2(GetMouseWheelMoveV()), delta_time);
+        Clay_UpdateScrollContainers(true, raylib_vec2_to_clay_vec2(mouse_scroll), delta_time);
 
         Clay_BeginLayout();
         CLAY(CLAY_ID("ImageParent"), { 
@@ -67,13 +63,26 @@ int main() {
             },
             .backgroundColor = COLOR_SLATE
         }) {
-            CLAY(CLAY_ID("ImageRect"), {
-                .image = { (void*) &image },
-                .aspectRatio = { ratio },
-                .layout = {
-                    .sizing = { .width = CLAY_SIZING_GROW() }
-                },
-            }) { }
+            Clay_BoundingBox parent_bb = Clay_GetElementData(CLAY_ID("ImageParent")).boundingBox;
+            printf("%f %f\n", parent_bb.height, parent_bb.width);
+            float parent_apect_ratio = parent_bb.width / parent_bb.height;
+            // Clay_Vector2 img_dims;
+            // if (parent_apect_ratio > ratio) {  // parent is wider than image
+            //     img_dims.y = parent_bb.height;
+            //     img_dims.x = parent_bb.height * ratio;
+            // }
+            // else {
+            //     img_dims.x = parent_bb.width;
+            //     img_dims.y = parent_bb.width / ratio;
+            // }
+            // CLAY(CLAY_ID("ImageRect"), {
+            //     .image = { (void*) &image },
+            //     .aspectRatio = { ratio },
+            //     .layout = {
+            //         .sizing = { .width  = {.size = img_dims.x, .type = CLAY__SIZING_TYPE_FIXED},
+            //                     .height = {.size = img_dims.y, .type = CLAY__SIZING_TYPE_FIXED}}
+            //     },
+            // }) { }
         }
         Clay_RenderCommandArray render_commands = Clay_EndLayout(delta_time);
 
