@@ -2,7 +2,11 @@
 
 ## Final Renderer
 - [ ] Zoom into cursor instead of center
-- [ ] Move zoomed image by dragging
+- [x] Move zoomed image by dragging
+
+### Rules for zoom and window resize
+- [ ] Should snap when image resolution = rendering resolution
+- [ ] ((Image should stay the same apparent size when resizing window, EXCEPT if rendering height = bounding box height))
 
 ## Shaders
 ### Final Shader

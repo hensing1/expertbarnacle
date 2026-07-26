@@ -14,15 +14,15 @@ int main() {
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
     Shader imageShader = LoadShader(0, "src/shaders/image.frag");
-    Texture2D image = LoadTexture("res/saft.png");
+    Texture2D image = LoadTexture("res/Kugelquiek.jpg");
     SetTextureWrap(image, TEXTURE_WRAP_MIRROR_REPEAT);
 
     while (!WindowShouldClose()) {
         InputInfo inputs = {
             .mousePos = GetMousePosition(),
             .mouseScroll = GetMouseWheelMoveV(),
-            .mouseLeft = IsMouseButtonPressed(MOUSE_BUTTON_LEFT),
-            .mouseRight = IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)
+            .mouseLeft = IsMouseButtonDown(MOUSE_BUTTON_LEFT),
+            .mouseRight = IsMouseButtonDown(MOUSE_BUTTON_RIGHT)
         };
 
         Rectangle screenRect = {

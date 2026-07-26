@@ -1,14 +1,27 @@
 #include <math.h>
 
 #include <raylib.h>
+#include <raymath.h>
 
 #include "render.h"
 #include "util.h"
 
+// typedef enum {
+//     MODE_STATIC,
+//     MODE_ZOOMING,
+//     MODE_DRAGGING
+// } Mode;
+//
+// static Mode currentMode;
+
 static float zoom = 1;
 static float zoomSpeed = 0;
-static const float zoomSpeedBoost = 0.04;
-static const float zoomSpeedDecay = 0.9;
+static const float zoomSpeedBoost = 0.02f;
+static const float zoomSpeedDecay = 0.85f;
+
+static bool isDragging = false;
+
+static Vector2 offset = {0, 0};
 
 static void handleZoom(InputInfo inputs) {
     if (fabsf(zoom - 1) <= 0.01 && zoomSpeed != 0) {  // snap to 1x zoom
@@ -20,7 +33,7 @@ static void handleZoom(InputInfo inputs) {
         zoomSpeed = 0;
     }
     else {
-        zoomSpeed *= powf(zoomSpeedDecay, 60. * GetFrameTime());
+        zoomSpeed *= powf(zoomSpeedDecay, 60.f * GetFrameTime());
         zoomSpeed += zoomSpeedBoost * inputs.mouseScroll.y;
     }
     if (zoomSpeed >= 0) {
@@ -33,7 +46,12 @@ static void handleZoom(InputInfo inputs) {
 }
 
 void renderImage(Texture2D image, Shader shader, Rectangle boundingBox, InputInfo inputs) {
-    handleZoom(inputs);
+    if (!isDragging) {
+        handleZoom(inputs);
+    }
+    else {
+        offset = Vector2Subtract(offset, GetMouseDelta());
+    }
 
     float bbAspectRatio = boundingBox.width / boundingBox.height;
     float imgAspectRatio = (float)image.width / image.height;
@@ -42,19 +60,18 @@ void renderImage(Texture2D image, Shader shader, Rectangle boundingBox, InputInf
             boundingBox.height / image.height :
             boundingBox.width / image.width;
     
-    float absZoom = zoom * zoomConversion; // zoom in terms of pixels
+    // 1x zoom == image fills whole bounding box -> need to express zoom in terms of actual pixels
+    float absZoom = zoom * zoomConversion;
 
     Rectangle virtualImageSize = {
         .width = image.width * absZoom,
         .height = image.height * absZoom
     };
-    virtualImageSize.x = (boundingBox.width - virtualImageSize.width) / 2;
-    virtualImageSize.y = (boundingBox.height - virtualImageSize.height) / 2;
 
     Rectangle imageTarget = {
         .width = min(virtualImageSize.width, boundingBox.width),
         .height = min(virtualImageSize.height, boundingBox.height),
-    }; //virtualImage cropped
+    };  // virtualImage cropped
     imageTarget.x = (boundingBox.width - imageTarget.width) / 2;
     imageTarget.y = (boundingBox.height - imageTarget.height) / 2;
     
@@ -67,8 +84,15 @@ void renderImage(Texture2D image, Shader shader, Rectangle boundingBox, InputInf
         virtualImageSize.height > boundingBox.height ?
             (boundingBox.height / virtualImageSize.height) * image.height :
             image.height;
-    imageCrop.x = (image.width - imageCrop.width) / 2;
-    imageCrop.y = (image.height - imageCrop.height) / 2;
+
+    Vector2 absOffset = Vector2Scale(offset, 1 / absZoom);
+    absOffset.x = max(0, min(image.width - imageCrop.width, absOffset.x));
+    absOffset.y = max(0, min(image.height - imageCrop.height, absOffset.y));
+
+    imageCrop.x = absOffset.x;
+    imageCrop.y = absOffset.y;
+
+    offset = Vector2Scale(absOffset, absZoom);
 
     // render
     BeginShaderMode(shader);
@@ -83,6 +107,18 @@ void renderImage(Texture2D image, Shader shader, Rectangle boundingBox, InputInf
         );
     }
     EndShaderMode();
+
+    isDragging = CheckCollisionPointRec(inputs.mousePos, imageTarget) &&
+        (virtualImageSize.height > boundingBox.height || virtualImageSize.width > boundingBox.width) &&
+        inputs.mouseLeft;
+
+    if (isDragging) {
+        zoomSpeed = 0;
+        SetMouseCursor(MOUSE_CURSOR_RESIZE_ALL);
+    }
+    else {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
 }
 
 float getImageZoomLevel() { return zoom; }
