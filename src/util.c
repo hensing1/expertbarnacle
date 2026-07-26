@@ -1,7 +1,6 @@
-#ifndef UTIL_H
-#define UTIL_H
+#include "util.h"
 
+float absf(float f) {return f >= 0 ? f : -f;}
 float min(float a, float b) {return a < b ? a : b;}
 float max(float a, float b) {return a > b ? a : b;}
-
-#endif /* #ifndef UTIL_H */
+float sgn(float f) {return f > 0 ? 1 : f == 0 ? 0 : -1;}
