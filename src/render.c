@@ -1,14 +1,17 @@
+#include <math.h>
+
+#include <raylib.h>
+
 #include "render.h"
 #include "util.h"
-#include <raylib.h>
 
 static float zoom = 1;
 static float zoomSpeed = 0;
 static const float zoomSpeedBoost = 0.04;
-static const float zoomSpeedDecay = 0.9;  // TODO: match to framerate
+static const float zoomSpeedDecay = 0.9;
 
 static void handleZoom(InputInfo inputs) {
-    if (absf(zoom - 1) < 0.01 && zoomSpeed != 0) {  // snap to 1x zoom
+    if (fabsf(zoom - 1) <= 0.01 && zoomSpeed != 0) {  // snap to 1x zoom
         zoom = 1;
         zoomSpeed = 0;
         return;
@@ -17,7 +20,7 @@ static void handleZoom(InputInfo inputs) {
         zoomSpeed = 0;
     }
     else {
-        zoomSpeed *= zoomSpeedDecay;
+        zoomSpeed *= powf(zoomSpeedDecay, 60. * GetFrameTime());
         zoomSpeed += zoomSpeedBoost * inputs.mouseScroll.y;
     }
     if (zoomSpeed >= 0) {
