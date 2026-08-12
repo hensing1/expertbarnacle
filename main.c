@@ -20,6 +20,7 @@ int main() {
     while (!WindowShouldClose()) {
         InputInfo inputs = {
             .mousePos = GetMousePosition(),
+            .mouseDelta = GetMouseDelta(),
             .mouseScroll = GetMouseWheelMoveV(),
             .mouseLeft = IsMouseButtonDown(MOUSE_BUTTON_LEFT),
             .mouseRight = IsMouseButtonDown(MOUSE_BUTTON_RIGHT)

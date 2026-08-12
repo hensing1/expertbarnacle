@@ -5,12 +5,13 @@
 
 typedef struct {
     Vector2 mousePos;
+    Vector2 mouseDelta;
     Vector2 mouseScroll;
     bool mouseLeft;
     bool mouseRight;
 } InputInfo;
 
-float getImageZoomLevel();
+// float getImageZoomLevel();
 void renderImage(Texture2D image, Shader shader, Rectangle boundingBox, InputInfo inputs);
 
 #endif  // INCLUDE_SRC_RENDER_H_
