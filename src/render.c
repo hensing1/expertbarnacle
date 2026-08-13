@@ -80,13 +80,13 @@ void renderImage(Texture2D image, Shader shader, Rectangle viewport, InputInfo i
     // enlarging/shrinking the image to fit the box
     float absZoom = zoom.relZoom * zoomConversion;
 
-    Rectangle virtualImageSize = {
+    Rectangle virtImgSize = {
         .width = image.width * absZoom,
         .height = image.height * absZoom
     };
 
-    virtImgCrop.width = min(virtualImageSize.width, viewport.width);
-    virtImgCrop.height = min(virtualImageSize.height, viewport.height);
+    virtImgCrop.width = min(virtImgSize.width, viewport.width);
+    virtImgCrop.height = min(virtImgSize.height, viewport.height);
 
     if (isDragging) {
         virtImgCrop.x -= inputs.mouseDelta.x;
@@ -95,23 +95,34 @@ void renderImage(Texture2D image, Shader shader, Rectangle viewport, InputInfo i
     else {
         virtImgCrop.x = (virtImgCrop.x + zoom.center.x) * zoom.relZoom / oldZoom - zoom.center.x;
         virtImgCrop.y = (virtImgCrop.y + zoom.center.y) * zoom.relZoom / oldZoom - zoom.center.y;
+
+        // if (virtImgCrop.x < 0) {virtImgCrop.x *= zoomSpeedDecay;}
+        // if (virtImgCrop.y < 0) {virtImgCrop.y *= zoomSpeedDecay;}
+        // if (virtImgCrop.x > virtualImageSize.width - virtImgCrop.width) {
+        //     virtImgCrop.x -= virtualImageSize.width - virtImgCrop.width;
+        //     virtImgCrop.x *= zoomSpeedDecay;
+        //     virtImgCrop.x += virtualImageSize.width - virtImgCrop.width;
+        // }
+        // if (virtImgCrop.y > virtualImageSize.height - virtImgCrop.height) {
+        //     virtImgCrop.y -= virtualImageSize.height - virtImgCrop.height;
+        //     virtImgCrop.y *= zoomSpeedDecay;
+        //     virtImgCrop.y += virtualImageSize.height - virtImgCrop.height;
+        // }
     }
-    virtImgCrop.x = clamp(virtImgCrop.x, 0, virtualImageSize.width - virtImgCrop.width);
-    virtImgCrop.y = clamp(virtImgCrop.y, 0, virtualImageSize.height - virtImgCrop.height);
+    virtImgCrop.x = clamp(virtImgCrop.x, 0, virtImgSize.width - virtImgCrop.width);
+    virtImgCrop.y = clamp(virtImgCrop.y, 0, virtImgSize.height - virtImgCrop.height);
     
     Rectangle imageCrop;
     imageCrop.width =
-        virtualImageSize.width > viewport.width ?
-            (viewport.width / virtualImageSize.width) * image.width :
+        virtImgSize.width > viewport.width ?
+            (viewport.width / virtImgSize.width) * image.width :
             image.width;
     imageCrop.height =
-        virtualImageSize.height > viewport.height ?
-            (viewport.height / virtualImageSize.height) * image.height :
+        virtImgSize.height > viewport.height ?
+            (viewport.height / virtImgSize.height) * image.height :
             image.height;
 
     
-    // imageCrop.x = clamp(virtImgCrop.x / absZoom, 0, image.width - imageCrop.width);
-    // imageCrop.y = clamp(virtImgCrop.y / absZoom, 0, image.height - imageCrop.height);
     imageCrop.x = virtImgCrop.x / absZoom;
     imageCrop.y = virtImgCrop.y / absZoom;
 
@@ -137,8 +148,8 @@ void renderImage(Texture2D image, Shader shader, Rectangle viewport, InputInfo i
     EndShaderMode();
 
     isDragging = CheckCollisionPointRec(inputs.mousePos, imageTarget) &&
-        (virtualImageSize.height > viewport.height || virtualImageSize.width > viewport.width) &&
-        inputs.mouseLeft;
+        (virtImgSize.height > viewport.height || virtImgSize.width > viewport.width) &&
+        inputs.mouseLeftDown;
 
     if (isDragging) {
         zoomSpeed = 0;

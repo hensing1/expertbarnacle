@@ -1,15 +1,9 @@
 #ifndef INCLUDE_SRC_RENDER_H_
 #define INCLUDE_SRC_RENDER_H_
 
-#include "raylib.h"
+#include <raylib.h>
 
-typedef struct {
-    Vector2 mousePos;
-    Vector2 mouseDelta;
-    Vector2 mouseScroll;
-    bool mouseLeft;
-    bool mouseRight;
-} InputInfo;
+#include "io.h"
 
 // float getImageZoomLevel();
 void renderImage(Texture2D image, Shader shader, Rectangle boundingBox, InputInfo inputs);
