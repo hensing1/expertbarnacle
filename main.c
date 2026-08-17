@@ -4,6 +4,7 @@
 
 #include "raylib.h"
 
+#define CLAY_IMPLEMENTATION
 #include "src/lib/clay.h"
 #include "src/lib/clay_renderer_raylib.c"
 
