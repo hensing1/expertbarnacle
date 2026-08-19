@@ -39,9 +39,14 @@ int main(int argc, char* argv[]) {
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
     Shader imageShader = LoadShader(0, "src/shaders/image.frag");
+    // int picDimLoc = GetShaderLocation(imageShader, "picSize");
+    // SetShaderValue(imageShader, picDimLoc, &(Vector2) {image.width, image.height}, SHADER_UNIFORM_VEC2);
+
     Texture2D imageTexture = LoadTextureFromImage(image);
-    SetTextureWrap(imageTexture, TEXTURE_WRAP_MIRROR_REPEAT);
     UnloadImage(image);
+    GenTextureMipmaps(&imageTexture);
+    SetTextureWrap(imageTexture, TEXTURE_WRAP_MIRROR_REPEAT);
+    SetTextureFilter(imageTexture, TEXTURE_FILTER_ANISOTROPIC_16X);
     
     Font fonts[] = {GetFontDefault()};
 

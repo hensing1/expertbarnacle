@@ -7,8 +7,8 @@ in vec2 fragTexCoord;
 uniform sampler2D texture0;
 
 // uniform vec2 rectDims;
-// uniform vec2 pictureDims;
-uniform float picScale;
+// uniform vec2 picSize;
+// uniform float picScale;
 
 out vec4 finalColor;
 
