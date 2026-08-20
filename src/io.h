@@ -16,4 +16,6 @@ typedef struct {
 
 InputInfo captureInputs();
 
+FilePathList getImageFiles(const char* directory);
+
 #endif  // INCLUDE_SRC_IO_H_

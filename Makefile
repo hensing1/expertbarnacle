@@ -1,6 +1,6 @@
 CC = clang
 CFLAGS = -g -fsanitize=address
-LIBS = -lraylib -lm
+LIBS = -lraylib -lunistring -lm
 
 # Target executable
 TARGET = build/main

@@ -2,6 +2,8 @@
 
 #include <raylib.h>
 
+#include "lib/clay.h"
+
 Clay_Vector2 convVec2RaylibClay(Vector2 vec) {return (Clay_Vector2){vec.x, vec.y};}
 
 Clay_RenderCommandArray createUI(InputInfo inputs) {

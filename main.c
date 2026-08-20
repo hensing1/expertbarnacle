@@ -19,21 +19,30 @@ void handleClayErrors(Clay_ErrorData errors);
 bool isFile(char* path);
 
 int main(int argc, char* argv[]) {
-    Image image;
+    char* filePath;
     if (argc > 1) {
         if (!isFile(argv[1])) {
             fprintf(stderr, "ERROR: Not a file: %s\n", argv[1]);
             return -1;
         }
-        image = LoadImage(argv[1]);
+        filePath = argv[1];
     }
     else {
-        image = LoadImage("res/Kugelquiek.jpg");
+        filePath = "res/Kugelquiek.jpg";
     }
 
+    const char* fileName = GetFileName(filePath);
+    const char* fileDir = GetDirectoryPath(filePath);
+    FilePathList allImgFiles = getImageFiles(fileDir);
+    for (int i = 0; i < allImgFiles.count; i++) {
+        printf("%s\n", allImgFiles.paths[i]);
+    }
+    UnloadDirectoryFiles(allImgFiles);
+
+    Image image = LoadImage(filePath);
     // initialize window and raylib
     Vector2 initWindowDims = getInitWindowDimensions(image);
-    InitWindow(initWindowDims.x, initWindowDims.y, "Expert image viewer deluxe edition +3");
+    InitWindow(initWindowDims.x, initWindowDims.y, fileName);
     SetWindowMinSize(400, 300);
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
@@ -46,7 +55,7 @@ int main(int argc, char* argv[]) {
     UnloadImage(image);
     GenTextureMipmaps(&imageTexture);
     SetTextureWrap(imageTexture, TEXTURE_WRAP_MIRROR_REPEAT);
-    SetTextureFilter(imageTexture, TEXTURE_FILTER_ANISOTROPIC_16X);
+    SetTextureFilter(imageTexture, TEXTURE_FILTER_TRILINEAR);
     
     Font fonts[] = {GetFontDefault()};
 
