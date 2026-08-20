@@ -12,6 +12,8 @@ Clay_RenderCommandArray createUI(InputInfo inputs) {
     Clay_UpdateScrollContainers(true, convVec2RaylibClay(inputs.mouseScroll), inputs.deltaTime);
 
     Clay_BeginLayout();
-    // ...
+    CLAY(CLAY_ID("GlobalContainer")){
+
+    }
     return Clay_EndLayout(inputs.deltaTime);
 }

@@ -67,6 +67,9 @@ int main(int argc, char* argv[]) {
         (Clay_Dimensions){ initWindowDims.x, initWindowDims.y },
         (Clay_ErrorHandler){ handleClayErrors }
     );
+    InitOverlay();
+    Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
+    Clay_SetDebugModeEnabled(true);
 
     while (!WindowShouldClose()) {
         InputInfo inputs = captureInputs();
