@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     Vector2 initWindowDims = getInitWindowDimensions(image);
     InitWindow(initWindowDims.x, initWindowDims.y, fileName);
     SetWindowMinSize(400, 300);
-    SetWindowState(FLAG_WINDOW_RESIZABLE);
+    SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
     Shader imageShader = LoadShader(0, "src/shaders/image.frag");
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     SetTextureWrap(imageTexture, TEXTURE_WRAP_MIRROR_REPEAT);
     SetTextureFilter(imageTexture, TEXTURE_FILTER_TRILINEAR);
     
-    Font fonts[] = {GetFontDefault()};
+    Font fonts[] = {LoadFont("./res/fonts/adwaita-sans/static/adwaita-sans-latin-500-normal.ttf"), GetFontDefault()};
 
     // initialize clay
     uint64_t arena_size = Clay_MinMemorySize();
@@ -69,21 +69,23 @@ int main(int argc, char* argv[]) {
     );
     InitOverlay();
     Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
-    Clay_SetDebugModeEnabled(true);
+    Clay__debugViewWidth = 600;
 
     while (!WindowShouldClose()) {
+        if (IsKeyPressed(KEY_D)) {
+            Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
+        }
         InputInfo inputs = captureInputs();
         Clay_RenderCommandArray uiRenderCommands = createUI(inputs);
 
-        Rectangle screenRect = {
-            .x = 0, .y = 0, .width = GetScreenWidth(), .height = GetScreenHeight()
-        };
+        Rectangle imageRect = CLAY_RECTANGLE_TO_RAYLIB_RECTANGLE(
+            Clay_GetElementData(Clay_GetElementId(CLAY_STRING("ImageContainer"))).boundingBox);
 
         BeginDrawing();
         {
-            DrawRectangleRec(screenRect, SLATE);
+            DrawRectangleRec(imageRect, SLATE);
             Clay_Raylib_Render(uiRenderCommands, fonts);
-            renderImage(imageTexture, imageShader, screenRect, inputs);
+            renderImage(imageTexture, imageShader, imageRect, inputs);
         }
         EndDrawing();
     }

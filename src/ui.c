@@ -12,8 +12,12 @@ Clay_RenderCommandArray createUI(InputInfo inputs) {
     Clay_UpdateScrollContainers(true, convVec2RaylibClay(inputs.mouseScroll), inputs.deltaTime);
 
     Clay_BeginLayout();
-    CLAY(CLAY_ID("GlobalContainer")){
-
+    CLAY(CLAY_ID("Global"),
+         { .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)}}})
+    {
+        CLAY(CLAY_ID("ImageContainer"),
+            { .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)}}})
+        {}
     }
     return Clay_EndLayout(inputs.deltaTime);
 }

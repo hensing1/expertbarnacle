@@ -3206,7 +3206,7 @@ Clay_Color CLAY__DEBUGVIEW_COLOR_SELECTED_ROW = {102, 80, 78, 255};
 const int32_t CLAY__DEBUGVIEW_ROW_HEIGHT = 30;
 const int32_t CLAY__DEBUGVIEW_OUTER_PADDING = 10;
 const int32_t CLAY__DEBUGVIEW_INDENT_WIDTH = 16;
-Clay_TextElementConfig Clay__DebugView_TextNameConfig = {.textColor = {238, 226, 231, 255}, .fontSize = 16, .wrapMode = CLAY_TEXT_WRAP_NONE };
+Clay_TextElementConfig Clay__DebugView_TextNameConfig = {.textColor = {238, 226, 231, 255}, .fontSize = 34, .wrapMode = CLAY_TEXT_WRAP_NONE };
 Clay_LayoutConfig Clay__DebugView_ScrollViewItemLayoutConfig = CLAY__DEFAULT_STRUCT;
 
 typedef struct {
@@ -3478,7 +3478,7 @@ void Clay__DebugViewRenderElementConfigHeader(Clay_String elementId, Clay__Debug
     Clay_Color backgroundColor = config.color;
     backgroundColor.a = 90;
     CLAY_AUTO_ID({ .layout = { .padding = { 8, 8, 2, 2 } }, .backgroundColor = backgroundColor, .cornerRadius = CLAY_CORNER_RADIUS(4), .border = { .color = config.color, .width = { 1, 1, 1, 1, 0 } } }) {
-        CLAY_TEXT(config.label, CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 16 }));
+        CLAY_TEXT(config.label, CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 34 }));
     }
 }
 
@@ -3535,8 +3535,8 @@ void Clay__RenderDebugView(void) {
 
     uint32_t initialRootsLength = context->layoutElementTreeRoots.length;
     uint32_t initialElementsLength = context->layoutElements.length;
-    Clay_TextElementConfig infoTextConfig = CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 16, .wrapMode = CLAY_TEXT_WRAP_NONE });
-    Clay_TextElementConfig infoTitleConfig = CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_3, .fontSize = 16, .wrapMode = CLAY_TEXT_WRAP_NONE });
+    Clay_TextElementConfig infoTextConfig = CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 34, .wrapMode = CLAY_TEXT_WRAP_NONE });
+    Clay_TextElementConfig infoTitleConfig = CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_3, .fontSize = 34, .wrapMode = CLAY_TEXT_WRAP_NONE });
     Clay_ElementId scrollId = Clay__HashString(CLAY_STRING("Clay__DebugViewOuterScrollPane"), 0);
     float scrollYOffset = 0;
     bool pointerInDebugView = context->pointerInfo.position.y < context->layoutDimensions.height - 300;
@@ -3574,7 +3574,7 @@ void Clay__RenderDebugView(void) {
                 .border = { .color = { 217,91,67,255 }, .width = { 1, 1, 1, 1, 0 } },
             }) {
                 Clay_OnHover(HandleDebugViewCloseButtonInteraction, 0);
-                CLAY_TEXT(CLAY_STRING("x"), CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 16 }));
+                CLAY_TEXT(CLAY_STRING("x"), CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 34 }));
             }
         }
         CLAY_AUTO_ID({ .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_FIXED(1)} }, .backgroundColor = CLAY__DEBUGVIEW_COLOR_3 } ) {}
@@ -3628,7 +3628,7 @@ void Clay__RenderDebugView(void) {
                 // Clay_LayoutConfig debug info
                 CLAY_AUTO_ID({ .layout = { .padding = attributeConfigPadding, .childGap = 8, .layoutDirection = CLAY_TOP_TO_BOTTOM } }) {
                     CLAY_AUTO_ID({ .layout = { .padding = { 8, 8, 2, 2 } }, .backgroundColor = { 200, 200, 200, 120 }, .cornerRadius = CLAY_CORNER_RADIUS(4), .border = { .color = { 200, 200, 200, 255 }, .width = { 1, 1, 1, 1, 0 } } }) {
-                        CLAY_TEXT(CLAY_STRING("Layout"), CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 16 }));
+                        CLAY_TEXT(CLAY_STRING("Layout"), CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 34 }));
                     }
                     // .boundingBox
                     CLAY_TEXT(CLAY_STRING("Bounding Box"), infoTitleConfig);
@@ -3741,7 +3741,7 @@ void Clay__RenderDebugView(void) {
                         Clay_Color backgroundColor = labelConfig.color;
                         backgroundColor.a = 90;
                         CLAY_AUTO_ID({ .layout = { .padding = { 8, 8, 2, 2 } }, .backgroundColor = backgroundColor, .cornerRadius = CLAY_CORNER_RADIUS(4), .border = { .color = labelConfig.color, .width = { 1, 1, 1, 1, 0 } } }) {
-                            CLAY_TEXT(CLAY_STRING("Color & Radius"), CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 16 }));
+                            CLAY_TEXT(CLAY_STRING("Color & Radius"), CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 34 }));
                         }
                         // .backgroundColor
                         if (selectedItem->layoutElement->config.backgroundColor.a > 0) {
@@ -3928,7 +3928,7 @@ void Clay__RenderDebugView(void) {
             }
         } else {
             CLAY(CLAY_ID("Clay__DebugViewWarningsScrollPane"), { .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_FIXED(300)}, .childGap = 6, .layoutDirection = CLAY_TOP_TO_BOTTOM }, .backgroundColor = CLAY__DEBUGVIEW_COLOR_2, .clip = { .horizontal = true, .vertical = true, .childOffset = Clay_GetScrollOffset() } }) {
-                Clay_TextElementConfig warningConfig = CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 16, .wrapMode = CLAY_TEXT_WRAP_NONE });
+                Clay_TextElementConfig warningConfig = CLAY_TEXT_CONFIG({ .textColor = CLAY__DEBUGVIEW_COLOR_4, .fontSize = 34, .wrapMode = CLAY_TEXT_WRAP_NONE });
                 CLAY(CLAY_ID("Clay__DebugViewWarningItemHeader"), { .layout = { .sizing = {.height = CLAY_SIZING_FIXED(CLAY__DEBUGVIEW_ROW_HEIGHT)}, .padding = {CLAY__DEBUGVIEW_OUTER_PADDING, CLAY__DEBUGVIEW_OUTER_PADDING, 0, 0 }, .childGap = 8, .childAlignment = {.y = CLAY_ALIGN_Y_CENTER} } }) {
                     CLAY_TEXT(CLAY_STRING("Warnings"), warningConfig);
                 }

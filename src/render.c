@@ -65,7 +65,7 @@ void renderImage(Texture2D image, Shader shader, Rectangle viewport, InputInfo i
     static bool isDragging = false;
     
     float oldZoom = zoom.relZoom;
-    if (!isDragging) {
+    if (!isDragging && CheckCollisionPointRec(inputs.mousePos, viewport)) {
         updateZoom(&zoom, inputs, viewport);
     }
 
