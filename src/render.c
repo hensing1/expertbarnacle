@@ -129,8 +129,8 @@ void renderImage(Texture2D image, Shader shader, Rectangle viewport, InputInfo i
     Rectangle imageTarget = {
         .width = virtImgCrop.width,
         .height = virtImgCrop.height,
-        .x = (viewport.width - virtImgCrop.width) / 2,
-        .y = (viewport.height - virtImgCrop.height) / 2,
+        .x = viewport.x + (viewport.width - virtImgCrop.width) / 2,
+        .y = viewport.y + (viewport.height - virtImgCrop.height) / 2,
     };
 
     // render

@@ -8,11 +8,12 @@
 #include "src/lib/clay.h"
 #include "src/lib/clay_renderer_raylib.c"
 
-#include "src/colors.h"
 #include "src/io.h"
 #include "src/render.h"
 #include "src/ui.h"
 #include "src/util.h"
+
+const Vector2 initWinDims = {1200, 900};
 
 Vector2 getInitWindowDimensions(Image);
 void handleClayErrors(Clay_ErrorData errors);
@@ -43,7 +44,7 @@ int main(int argc, char* argv[]) {
     // initialize window and raylib
     Vector2 initWindowDims = getInitWindowDimensions(image);
     InitWindow(initWindowDims.x, initWindowDims.y, fileName);
-    SetWindowMinSize(400, 300);
+    SetWindowMinSize(600, 450);
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
@@ -83,7 +84,7 @@ int main(int argc, char* argv[]) {
 
         BeginDrawing();
         {
-            DrawRectangleRec(imageRect, SLATE);
+            // DrawRectangleRec(imageRect, SLATE);
             Clay_Raylib_Render(uiRenderCommands, fonts);
             renderImage(imageTexture, imageShader, imageRect, inputs);
         }
@@ -96,16 +97,16 @@ int main(int argc, char* argv[]) {
 
 Vector2 getInitWindowDimensions(Image image) {
     if (!IsImageValid(image)) {
-        return (Vector2){800, 600};
+        return initWinDims;
     }
     float imageAspectRatio = (float)image.width / image.height;
     float width, height;
     if (imageAspectRatio > 1.333) {
-        width = min(image.width, 800);
+        width = min(image.width, initWinDims.x);
         height = max(width / imageAspectRatio, 300);
     }
     else {
-        height = min(image.height, 600);
+        height = min(image.height, initWinDims.y);
         width = max(height * imageAspectRatio, 400);
     }
     return (Vector2){width, height};
