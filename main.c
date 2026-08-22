@@ -8,8 +8,10 @@
 #include "src/lib/clay.h"
 #include "src/lib/clay_renderer_raylib.c"
 
+#include "src/format.h"
 #include "src/io.h"
 #include "src/render.h"
+#include "src/state.h"
 #include "src/ui.h"
 #include "src/util.h"
 
@@ -18,32 +20,21 @@ const Vector2 initWinDims = {1200, 900};
 Vector2 getInitWindowDimensions(Image);
 void handleClayErrors(Clay_ErrorData errors);
 bool isFile(char* path);
+char* parseArgs(int argc, char* argv[]);
 
 int main(int argc, char* argv[]) {
-    char* filePath;
-    if (argc > 1) {
-        if (!isFile(argv[1])) {
-            fprintf(stderr, "ERROR: Not a file: %s\n", argv[1]);
-            return -1;
-        }
-        filePath = argv[1];
-    }
-    else {
-        filePath = "res/Kugelquiek.jpg";
-    }
+    char* filePath = parseArgs(argc, argv);
+    if (!filePath) {return -1;}
 
-    const char* fileName = GetFileName(filePath);
-    const char* fileDir = GetDirectoryPath(filePath);
-    FilePathList allImgFiles = getImageFiles(fileDir);
-    for (int i = 0; i < allImgFiles.count; i++) {
-        printf("%s\n", allImgFiles.paths[i]);
-    }
-    UnloadDirectoryFiles(allImgFiles);
+    initLocale();
 
+    ApplicationState state = initAppState(filePath);
     Image image = LoadImage(filePath);
+    ImageInfo imageInfo = loadImageInfo(image, filePath);
+
     // initialize window and raylib
     Vector2 initWindowDims = getInitWindowDimensions(image);
-    InitWindow(initWindowDims.x, initWindowDims.y, fileName);
+    InitWindow(initWindowDims.x, initWindowDims.y, imageInfo.fileName);
     SetWindowMinSize(600, 450);
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
@@ -76,8 +67,11 @@ int main(int argc, char* argv[]) {
         if (IsKeyPressed(KEY_D)) {
             Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
         }
+        if (IsKeyPressed(KEY_I)) {
+            state.infoScreenOpen ^= true;
+        }
         InputInfo inputs = captureInputs();
-        Clay_RenderCommandArray uiRenderCommands = createUI(inputs);
+        Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs);
 
         Rectangle imageRect = CLAY_RECTANGLE_TO_RAYLIB_RECTANGLE(
             Clay_GetElementData(Clay_GetElementId(CLAY_STRING("ImageContainer"))).boundingBox);
@@ -91,7 +85,19 @@ int main(int argc, char* argv[]) {
         EndDrawing();
     }
     CloseWindow();
+    freeImageInfo(imageInfo);
     return 0;
+}
+
+char* parseArgs(int argc, char* argv[]) {
+    if (argc == 1) {
+        return "res/Kugelquiek.jpg";
+    }
+    if (!isFile(argv[1])) {
+        fprintf(stderr, "ERROR: Not a file: %s\n", argv[1]);
+        return NULL;
+    }
+    return argv[1];
 }
 
 
@@ -116,7 +122,3 @@ void handleClayErrors(Clay_ErrorData errors) {
     fprintf(stderr, "Clay Error: %s\n", errors.errorText.chars);
 }
 
-bool isFile(char* file) {
-    struct stat s;
-    return stat(file, &s) == 0 && (s.st_mode & S_IFREG);
-}

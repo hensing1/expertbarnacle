@@ -14,7 +14,8 @@ Camera Raylib_camera;
 
 typedef enum
 {
-    CUSTOM_LAYOUT_ELEMENT_TYPE_3D_MODEL
+    CUSTOM_LAYOUT_ELEMENT_TYPE_3D_MODEL,
+    CUSTOM_LAYOUT_ELEMENT_TYPE_IMAGE
 } CustomLayoutElementType;
 
 typedef struct

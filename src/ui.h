@@ -3,7 +3,8 @@
 
 #include "lib/clay.h"
 #include "render.h"
+#include "state.h"
 
-Clay_RenderCommandArray createUI(InputInfo inputs);
+Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs);
 
 #endif  // INCLUDE_SRC_UI_H_
