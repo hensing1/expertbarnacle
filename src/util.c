@@ -1,11 +1,17 @@
 #include "util.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <unicase.h>
 #include <uninorm.h>
 
+float absf(float f) {
+    float negZero = -0.f;
+    int abs = *(int*)&f & ~*(int*)&negZero; // nothing to see here
+    return *(float*)&abs;
+}
 float clamp(float f, float low, float high) {return max(low, min(f, high));}
 float min(float a, float b) {return a < b ? a : b;}
 float max(float a, float b) {return a > b ? a : b;}
