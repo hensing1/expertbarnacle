@@ -12,9 +12,7 @@ typedef struct {
     const char* fileName;
     char* fullPath;
     size_t sizeBytes;
-    char* sizeStr;
     time_t timeModifiedUnix;  // unix time stamp, in seconds
-    char* timeModifiedStr;
 } ImageInfo;
 
 typedef struct {

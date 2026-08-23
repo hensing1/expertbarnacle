@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
     initLocale();
 
     ApplicationState state = initAppState(filePath);
+    state.infoScreenOpen = true;
     Image image = LoadImage(filePath);
     ImageInfo imageInfo = loadImageInfo(image, filePath);
 
@@ -49,7 +50,7 @@ int main(int argc, char* argv[]) {
     SetTextureWrap(imageTexture, TEXTURE_WRAP_MIRROR_REPEAT);
     SetTextureFilter(imageTexture, TEXTURE_FILTER_TRILINEAR);
     
-    Font fonts[] = {LoadFont("./res/fonts/adwaita-sans/static/adwaita-sans-latin-500-normal.ttf"), GetFontDefault()};
+    Font fonts[] = {LoadFontEx("./res/fonts/InterDisplay-Regular.otf", 32, NULL, 250), GetFontDefault()};
 
     // initialize clay
     uint64_t arena_size = Clay_MinMemorySize();
@@ -63,6 +64,8 @@ int main(int argc, char* argv[]) {
     Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
     Clay__debugViewWidth = 600;
 
+    Clay_String* strings = makeApplicationStrings(LANG_DE, imageInfo);
+
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_D)) {
             Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
@@ -71,7 +74,7 @@ int main(int argc, char* argv[]) {
             state.infoScreenOpen ^= true;
         }
         InputInfo inputs = captureInputs();
-        Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs);
+        Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs, strings);
 
         Rectangle imageRect = CLAY_RECTANGLE_TO_RAYLIB_RECTANGLE(
             Clay_GetElementData(Clay_GetElementId(CLAY_STRING("ImageContainer"))).boundingBox);

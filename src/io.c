@@ -44,16 +44,12 @@ ImageInfo loadImageInfo(Image image, const char* filepath) {
         .fileName = GetFileName(filepath),
         .fullPath = fullPath,
         .sizeBytes = filestat.st_size,
-        .sizeStr = fmtFileSize(filestat.st_size),
         .timeModifiedUnix = filestat.st_mtim.tv_sec,
-        .timeModifiedStr = fmtDateTime(filestat.st_mtim.tv_sec),
     };
 }
 
 void freeImageInfo(ImageInfo image) {
     FREE_PTR(image.fullPath);
-    FREE_PTR(image.timeModifiedStr);
-    FREE_PTR(image.sizeStr);
 }
 
 FilePathList getImagePaths(const char* directory) {
