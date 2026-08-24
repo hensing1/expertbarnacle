@@ -50,7 +50,8 @@ int main(int argc, char* argv[]) {
     SetTextureWrap(imageTexture, TEXTURE_WRAP_MIRROR_REPEAT);
     SetTextureFilter(imageTexture, TEXTURE_FILTER_TRILINEAR);
     
-    Font fonts[] = {LoadFontEx("./res/fonts/InterDisplay-Regular.otf", 32, NULL, 250), GetFontDefault()};
+    char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-500-normal.ttf";
+    Font fonts[] = {LoadFontEx(fontFile, 28, NULL, 250), LoadFontEx(fontFile, 32, NULL, 250)};
 
     // initialize clay
     uint64_t arena_size = Clay_MinMemorySize();

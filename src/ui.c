@@ -19,8 +19,8 @@ void infoBox(Clay_String id, int index, Clay_String title, Clay_String content) 
                     .padding = 10 },
         .backgroundColor = C_BLUE,
     }) {
-        CLAY_TEXT(title, { .textColor = C_LIGHTGRAY, .fontSize = 32 });
-        CLAY_TEXT(content, { .textColor = C_WHITE, .fontSize = 36 });
+        CLAY_TEXT(title, { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
+        CLAY_TEXT(content, { .textColor = C_WHITE, .fontId = 1, .fontSize = 32 });
     }
 }
 
@@ -29,6 +29,9 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
     Clay_SetPointerState(convVec2RaylibClay(inputs.mousePos), inputs.mouseLeftPressed);
     Clay_UpdateScrollContainers(true, convVec2RaylibClay(inputs.mouseScroll), inputs.deltaTime);
 
+    static int sidebarWidth = 400;
+    if (IsKeyDown(KEY_LEFT)) sidebarWidth++;
+    if (IsKeyDown(KEY_RIGHT)) sidebarWidth--;
     Clay_BeginLayout();
     CLAY(CLAY_ID("Global"), {
         .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)} },
@@ -60,7 +63,7 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
        
         if (state.infoScreenOpen) {
             CLAY(CLAY_ID("InfoSidebar"), {
-                .layout = { .sizing = {CLAY_SIZING_FIXED(400), CLAY_SIZING_GROW(0)},
+                .layout = { .sizing = {CLAY_SIZING_FIXED(sidebarWidth), CLAY_SIZING_GROW(0)},
                             .padding = CLAY_PADDING_ALL(5) },
             }) {
                 CLAY(CLAY_ID("InfoSidebarInner"), {
@@ -72,9 +75,9 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
                                 .color = C_GRAY },
                     // .cornerRadius = CLAY_CORNER_RADIUS(10)
                 }) {
-                    infoBox(CLAY_STRING("InfoSidebarBox"), 1, CLAY_STRING("och nö"), CLAY_STRING("och nö"));
-                    // infoBox(CLAY_STRING("InfoSidebarBox"), 2, strings[STR_FILESIZE_TITLE], strings[STR_FILESIZE]);
-                    // infoBox(CLAY_STRING("InfoSidebarBox"), 3, strings[STR_TIME_MODIFIED_TITLE], strings[STR_TIME_MODIFIED]);
+                    infoBox(CLAY_STRING("InfoSidebarBox"), 1, strings[STR_RESOLUTION_TITLE], strings[STR_RESOLUTION]);
+                    infoBox(CLAY_STRING("InfoSidebarBox"), 2, strings[STR_FILESIZE_TITLE], strings[STR_FILESIZE]);
+                    infoBox(CLAY_STRING("InfoSidebarBox"), 3, strings[STR_TIME_MODIFIED_TITLE], strings[STR_TIME_MODIFIED]);
                 }
             }
         }

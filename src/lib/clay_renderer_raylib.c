@@ -139,7 +139,7 @@ static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_Tex
     float maxTextWidth = 0.0f;
     float lineTextWidth = 0;
     int maxLineCharCount = 0;
-    int lineCharCount = 0;
+    // int lineCharCount = 0;
 
     float textHeight = config->fontSize;
     Font* fonts = (Font*)userData;
@@ -151,25 +151,31 @@ static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_Tex
     }
 
     float scaleFactor = config->fontSize/(float)fontToUse.baseSize;
-
-    for (int i = 0; i < text.length; ++i, lineCharCount++)
+    int codepointSize;
+    int codepointCount = GetCodepointCount(text.chars);
+    for (int i = 0; text.chars[i] != '\0'; i += codepointSize)
     {
         if (text.chars[i] == '\n') {
             maxTextWidth = fmax(maxTextWidth, lineTextWidth);
-            maxLineCharCount = CLAY__MAX(maxLineCharCount, lineCharCount);
+            maxLineCharCount = CLAY__MAX(maxLineCharCount, codepointCount);
             lineTextWidth = 0;
-            lineCharCount = 0;
+            // lineCharCount = 0;
             continue;
         }
-        int index = text.chars[i] - 32;
-        if (fontToUse.glyphs[index].advanceX != 0) lineTextWidth += fontToUse.glyphs[index].advanceX;
-        else lineTextWidth += (fontToUse.recs[index].width + fontToUse.glyphs[index].offsetX);
+        
+        // GetCodepointNext(text.chars + i, &codepointSize);
+        int codepoint = GetCodepoint(text.chars + i, &codepointSize);
+        lineTextWidth += GetGlyphInfo(fontToUse, codepoint).advanceX;
+        // lineTextWidth += GetGlyphAtlasRec(fontToUse, codepoint).width;
+        // int index = text.chars[i] - 32;
+        // if (fontToUse.glyphs[index].advanceX != 0) lineTextWidth += fontToUse.glyphs[index].advanceX;
+        // else lineTextWidth += (fontToUse.recs[index].width + fontToUse.glyphs[index].offsetX);
     }
 
     maxTextWidth = fmax(maxTextWidth, lineTextWidth);
-    maxLineCharCount = CLAY__MAX(maxLineCharCount, lineCharCount);
+    maxLineCharCount = CLAY__MAX(maxLineCharCount, codepointCount);
 
-    textSize.width = maxTextWidth * scaleFactor + (lineCharCount * config->letterSpacing);
+    textSize.width = maxTextWidth * scaleFactor + (maxLineCharCount * config->letterSpacing);
     textSize.height = textHeight;
 
     return textSize;

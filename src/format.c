@@ -18,11 +18,11 @@ Clay_String* makeApplicationStrings(Languages lang, ImageInfo img) {
     Clay_String* s = malloc(sizeof(Clay_String) * NUM_APPL_STRINGS);
     switch(lang) {
     case LANG_DE:
-        s[STR_RESOLUTION_TITLE] = mkClayString("Auflosung");
+        s[STR_RESOLUTION_TITLE] = CLAY_STRING("Auflösung");
         s[STR_RESOLUTION] = fmtClayString("%d x %d", img.width, img.height);
-        s[STR_FILESIZE_TITLE] = mkClayString("Dateigrose");
+        s[STR_FILESIZE_TITLE] = CLAY_STRING("Dateigröße");
         s[STR_FILESIZE] = mkClayString(fmtFileSize(img.sizeBytes));
-        s[STR_TIME_MODIFIED_TITLE] = mkClayString("Datei geandert");
+        s[STR_TIME_MODIFIED_TITLE] = CLAY_STRING("Datei geändert");
         s[STR_TIME_MODIFIED] = mkClayString(fmtDateTime(img.timeModifiedUnix));
     }
     return s;
@@ -39,7 +39,7 @@ Clay_String mkClayString(const char *s) {
     return (Clay_String) {
         .chars = s,
         .isStaticallyAllocated = false,
-        .length = u8_mbsnlen((uint8_t*)s, u8_strlen((uint8_t*)s))
+        .length = u8_strlen((uint8_t*)s)
     };
 }
 
@@ -54,7 +54,7 @@ Clay_String fmtClayString(const char* format, ...) {
     return (Clay_String) {
         .chars = buf,
         .isStaticallyAllocated = false,
-        .length = u8_mbsnlen((uint8_t*)buf, u8_strlen((uint8_t*)buf))
+        .length = n
     };
 }
 
