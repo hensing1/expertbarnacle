@@ -9,7 +9,8 @@
 #include "src/lib/clay.h"
 #include "src/lib/clay_renderer_raylib.c"
 
-#include "src/util.c"
+// #include "src/util.h"
+#include "src/colors.h"
 
 
 
@@ -48,7 +49,7 @@ int main() {
         Vector2 mouse_scroll = GetMouseWheelMoveV();
         if (mouse_scroll.y < 0) { scale /= 1.1; }
         else if (mouse_scroll.y > 0) { scale *= 1.1; }
-        scale = max(scale, 1);
+        // scale = max(scale, 1);
 
         // do clay things
         Clay_SetLayoutDimensions((Clay_Dimensions){ GetScreenWidth(), GetScreenHeight() });
@@ -61,28 +62,9 @@ int main() {
                 .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)},
                 .childAlignment = { .x = CLAY_ALIGN_X_CENTER, .y = CLAY_ALIGN_Y_CENTER }
             },
-            .backgroundColor = COLOR_SLATE
+            .backgroundColor = C_SLATE
         }) {
-            Clay_BoundingBox parent_bb = Clay_GetElementData(CLAY_ID("ImageParent")).boundingBox;
-            printf("%f %f\n", parent_bb.height, parent_bb.width);
-            float parent_apect_ratio = parent_bb.width / parent_bb.height;
-            // Clay_Vector2 img_dims;
-            // if (parent_apect_ratio > ratio) {  // parent is wider than image
-            //     img_dims.y = parent_bb.height;
-            //     img_dims.x = parent_bb.height * ratio;
-            // }
-            // else {
-            //     img_dims.x = parent_bb.width;
-            //     img_dims.y = parent_bb.width / ratio;
-            // }
-            // CLAY(CLAY_ID("ImageRect"), {
-            //     .image = { (void*) &image },
-            //     .aspectRatio = { ratio },
-            //     .layout = {
-            //         .sizing = { .width  = {.size = img_dims.x, .type = CLAY__SIZING_TYPE_FIXED},
-            //                     .height = {.size = img_dims.y, .type = CLAY__SIZING_TYPE_FIXED}}
-            //     },
-            // }) { }
+            CLAY_TEXT(CLAY_STRING("ööö"), {.textColor = C_WHITE, .fontSize = 35});
         }
         Clay_RenderCommandArray render_commands = Clay_EndLayout(delta_time);
 

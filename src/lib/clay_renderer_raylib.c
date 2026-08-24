@@ -162,7 +162,7 @@ static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_Tex
             lineCharCount = 0;
             continue;
         }
-        
+
         // GetCodepointNext(text.chars + i, &codepointSize);
         int codepoint = GetCodepoint(text.chars + i, &codepointSize);
         lineTextWidth += GetGlyphInfo(fontToUse, codepoint).advanceX;

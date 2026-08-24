@@ -16,8 +16,12 @@ void infoBox(Clay_String id, int index, Clay_String title, Clay_String content) 
     CLAY(CLAY_SIDI_LOCAL(id, index), {
         .layout = { .sizing = { CLAY_SIZING_GROW(0), CLAY_SIZING_FIT() },
                     .layoutDirection = CLAY_TOP_TO_BOTTOM,
-                    .padding = 10 },
-        .backgroundColor = C_BLUE,
+                    .padding = CLAY_PADDING_ALL(10),
+                    .childGap = 10 },
+        // .border = { .width = CLAY_BORDER_ALL(2),
+        //             .color = C_GRAY },
+        // .cornerRadius = CLAY_CORNER_RADIUS(10),
+        .backgroundColor = C_SLATE,
     }) {
         CLAY_TEXT(title, { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
         CLAY_TEXT(content, { .textColor = C_WHITE, .fontId = 1, .fontSize = 32 });
@@ -64,16 +68,17 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
         if (state.infoScreenOpen) {
             CLAY(CLAY_ID("InfoSidebar"), {
                 .layout = { .sizing = {CLAY_SIZING_FIXED(sidebarWidth), CLAY_SIZING_GROW(0)},
-                            .padding = CLAY_PADDING_ALL(5) },
+                            .padding = {3, 0, 0, 0} },
             }) {
                 CLAY(CLAY_ID("InfoSidebarInner"), {
                     .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)},
                                 .padding = CLAY_PADDING_ALL(16),
                                 .layoutDirection = CLAY_TOP_TO_BOTTOM,
                                 .childGap = 16},
-                    .border = { .width = CLAY_BORDER_OUTSIDE(2),
-                                .color = C_GRAY },
-                    // .cornerRadius = CLAY_CORNER_RADIUS(10)
+                    // .border = { .width = CLAY_BORDER_OUTSIDE(3),
+                    //             .color = C_GRAY },
+                    // .cornerRadius = (Clay_CornerRadius){16, 0, 0, 0},
+                    .backgroundColor = {30, 29, 36, 255}
                 }) {
                     infoBox(CLAY_STRING("InfoSidebarBox"), 1, strings[STR_RESOLUTION_TITLE], strings[STR_RESOLUTION]);
                     infoBox(CLAY_STRING("InfoSidebarBox"), 2, strings[STR_FILESIZE_TITLE], strings[STR_FILESIZE]);
