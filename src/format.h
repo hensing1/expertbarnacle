@@ -25,8 +25,11 @@ typedef enum {
 void initLocale();
 
 Clay_String* makeApplicationStrings(Languages lang, ImageInfo img);
+void freeApplicationStrings(Clay_String* s);
 
+/** A function for dynamically allocated strings to be used in the UI */
 Clay_String mkClayString(const char* s);
+
 Clay_String fmtClayString(const char* format, ...);
 char* fmtDateTime(time_t time);
 char* fmtFileSize(size_t numBytes);

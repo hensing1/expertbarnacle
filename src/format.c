@@ -8,8 +8,6 @@
 #include <string.h>
 #include <time.h>
 
-#include <unistr.h>
-
 void initLocale() {
     setlocale(LC_ALL, "");
 }
@@ -39,7 +37,7 @@ Clay_String mkClayString(const char *s) {
     return (Clay_String) {
         .chars = s,
         .isStaticallyAllocated = false,
-        .length = u8_strlen((uint8_t*)s)
+        .length = strlen(s)
     };
 }
 

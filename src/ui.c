@@ -29,7 +29,7 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
     Clay_SetPointerState(convVec2RaylibClay(inputs.mousePos), inputs.mouseLeftPressed);
     Clay_UpdateScrollContainers(true, convVec2RaylibClay(inputs.mouseScroll), inputs.deltaTime);
 
-    static int sidebarWidth = 400;
+    static int sidebarWidth = 300;
     if (IsKeyDown(KEY_LEFT)) sidebarWidth++;
     if (IsKeyDown(KEY_RIGHT)) sidebarWidth--;
     Clay_BeginLayout();

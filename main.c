@@ -90,6 +90,7 @@ int main(int argc, char* argv[]) {
     }
     CloseWindow();
     freeImageInfo(imageInfo);
+    freeApplicationStrings(strings);
     return 0;
 }
 

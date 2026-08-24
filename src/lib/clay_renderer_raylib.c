@@ -139,7 +139,7 @@ static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_Tex
     float maxTextWidth = 0.0f;
     float lineTextWidth = 0;
     int maxLineCharCount = 0;
-    // int lineCharCount = 0;
+    int lineCharCount = 0;
 
     float textHeight = config->fontSize;
     Font* fonts = (Font*)userData;
@@ -152,14 +152,14 @@ static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_Tex
 
     float scaleFactor = config->fontSize/(float)fontToUse.baseSize;
     int codepointSize;
-    int codepointCount = GetCodepointCount(text.chars);
-    for (int i = 0; text.chars[i] != '\0'; i += codepointSize)
+    for (int i = 0; i < text.length; i += codepointSize, lineCharCount++)
     {
         if (text.chars[i] == '\n') {
             maxTextWidth = fmax(maxTextWidth, lineTextWidth);
-            maxLineCharCount = CLAY__MAX(maxLineCharCount, codepointCount);
+            maxLineCharCount = CLAY__MAX(maxLineCharCount, lineCharCount);
+            codepointSize = 1;
             lineTextWidth = 0;
-            // lineCharCount = 0;
+            lineCharCount = 0;
             continue;
         }
         
@@ -173,9 +173,9 @@ static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_Tex
     }
 
     maxTextWidth = fmax(maxTextWidth, lineTextWidth);
-    maxLineCharCount = CLAY__MAX(maxLineCharCount, codepointCount);
+    maxLineCharCount = CLAY__MAX(maxLineCharCount, lineCharCount);
 
-    textSize.width = maxTextWidth * scaleFactor + (maxLineCharCount * config->letterSpacing);
+    textSize.width = maxTextWidth * scaleFactor + ((maxLineCharCount - 1) * config->letterSpacing);
     textSize.height = textHeight;
 
     return textSize;
