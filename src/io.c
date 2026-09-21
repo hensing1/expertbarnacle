@@ -7,7 +7,6 @@
 
 #include <raylib.h>
 
-#include "format.h"
 #include "util.h"
 
 #define IMAGE_TYPES ".png;.bmp;.tga;.jpg;.jpeg;.gif;.qoi;.psd;.dds;.hdr;.ktx;.astc;.pkm;.pvr"

@@ -3,7 +3,6 @@
 #include <stdio.h>
 
 #include <raylib.h>
-#include <string.h>
 #include "lib/clay.h"
 
 #include "colors.h"
@@ -20,7 +19,6 @@ void infoBox(Clay_String id, int index, Clay_String title, Clay_String content) 
                     .childGap = 10 },
         // .border = { .width = CLAY_BORDER_ALL(2),
         //             .color = C_GRAY },
-        // .cornerRadius = CLAY_CORNER_RADIUS(10),
         .backgroundColor = C_SLATE,
     }) {
         CLAY_TEXT(title, { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
@@ -41,13 +39,13 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
         .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)} },
         .backgroundColor = C_SLATE
     }) {
-        // CLAY(CLAY_ID("MenuBar"), {
-        //     .layout = { .sizing = {CLAY_SIZING_GROW(0), 64 }},
-        //     .backgroundColor = BLACK
-        // }) {
-        // }
+        // CustomLayoutElement custom = {
+        //     .type = CUSTOM_LAYOUT_ELEMENT_TYPE_MAINIMAGE,
+        //     .customData.imageRenderParams = { .zoom = 1 }
+        // };
         CLAY(CLAY_ID("ImageContainer"), {
             .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)} },
+            // .custom = { .customData = &custom }
         }) {
             // CLAY(CLAY_ID("PrevImage"), {
             //     .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)} },
@@ -75,9 +73,6 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
                                 .padding = CLAY_PADDING_ALL(16),
                                 .layoutDirection = CLAY_TOP_TO_BOTTOM,
                                 .childGap = 16},
-                    // .border = { .width = CLAY_BORDER_OUTSIDE(3),
-                    //             .color = C_GRAY },
-                    // .cornerRadius = (Clay_CornerRadius){16, 0, 0, 0},
                     .backgroundColor = {30, 29, 36, 255}
                 }) {
                     infoBox(CLAY_STRING("InfoSidebarBox"), 1, strings[STR_RESOLUTION_TITLE], strings[STR_RESOLUTION]);

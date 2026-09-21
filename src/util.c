@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include <unicase.h>
-#include <uninorm.h>
 
 float absf(float f) {
     float negZero = -0.f;
