@@ -4,6 +4,9 @@
 
 #include "raylib.h"
 
+#define ARENA_IMPLEMENTATION
+#include "src/lib/arena.h"
+
 #define CLAY_IMPLEMENTATION
 #include "src/lib/clay.h"
 #include "src/lib/clay_renderer_raylib.c"
@@ -27,6 +30,8 @@ int main(int argc, char* argv[]) {
     if (!filePath) {return -1;}
 
     initLocale();
+
+    Arena appArena = {};
 
     ApplicationState state = initAppState(filePath);
     state.infoScreenOpen = true;
@@ -54,10 +59,10 @@ int main(int argc, char* argv[]) {
     Font fonts[] = {LoadFontEx(fontFile, 28, NULL, 250), LoadFontEx(fontFile, 32, NULL, 250)};
 
     // initialize clay
-    uint64_t arena_size = Clay_MinMemorySize();
-    Clay_Arena arena = Clay_CreateArenaWithCapacityAndMemory(arena_size, malloc(arena_size));
+    uint64_t clayArenaSize = Clay_MinMemorySize();
+    Clay_Arena clayArena = Clay_CreateArenaWithCapacityAndMemory(clayArenaSize, malloc(clayArenaSize));
     Clay_Initialize(
-        arena,
+        clayArena,
         (Clay_Dimensions){ initWindowDims.x, initWindowDims.y },
         (Clay_ErrorHandler){ handleClayErrors }
     );
@@ -89,6 +94,7 @@ int main(int argc, char* argv[]) {
         EndDrawing();
     }
     CloseWindow();
+    // free(clayArena.memory);
     freeImageInfo(imageInfo);
     freeApplicationStrings(strings);
     return 0;
