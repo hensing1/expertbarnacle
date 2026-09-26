@@ -60,11 +60,23 @@ int main(int argc, char* argv[]) {
     ImageData image = loadImage(filePath); 
 
     while (!WindowShouldClose()) {
+        #ifdef DEBUG
         if (IsKeyPressed(KEY_D)) {
             Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
         }
+        #endif /* ifdef DEBUG */
         if (IsKeyPressed(KEY_I)) {
             state.infoScreenOpen ^= true;
+        }
+        if (IsKeyPressed(KEY_LEFT)) {
+            freeImage(image);
+            state.currentImgIndex = max(0, state.currentImgIndex - 1);
+            image = loadImage(state.imgFilesInDir.paths[state.currentImgIndex]);
+        }
+        if (IsKeyPressed(KEY_RIGHT)) {
+            freeImage(image);
+            state.currentImgIndex = min(state.imgFilesInDir.count - 1, state.currentImgIndex + 1);
+            image = loadImage(state.imgFilesInDir.paths[state.currentImgIndex]);
         }
         InputInfo inputs = captureInputs();
         Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs, image.strings);

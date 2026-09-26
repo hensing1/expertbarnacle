@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -g -fsanitize=address
+CFLAGS = -std=gnu11 -O3
 LIBS = -lraylib -lunistring -lm
 
 # Target executable
@@ -17,6 +17,10 @@ OBJ_FILES = $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(ALL_SRC)))
 
 # Default target
 all: $(TARGET)
+
+# For `make debug`
+debug: CFLAGS = -std=gnu11 -Wall -g -fsanitize=address -DDEBUG
+debug: $(TARGET)
 
 # Create build directory if it doesn't exist
 $(OBJ_DIR):

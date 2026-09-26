@@ -4,11 +4,23 @@
 #include <stddef.h>
 
 #define FREE_PTR(ptr) do{ if(ptr) {free(ptr); ptr = NULL;} } while(0)
+#define min(a, b) (a) <= (b) ? (a) : (b)
+    // _Generic((a), \
+    //     int: _Generic((b), int: intmin, float: floatmin), \
+    //     float: floatmin \
+    // )(a, b)
+#define max(a, b) (a) >= (b) ? (a) : (b)
+    // _Generic((a), \
+    //     int: _Generic((b), int: intmax, float: floatmax), \
+    //     float: floatmax \
+    // )(a, b)
 
 float absf(float f);
 float clamp(float f, float low, float high);
-float min(float a, float b);
-float max(float a, float b);
+int intmin(int a, int b);
+int intmax(int a, int b);
+float floatmin(float a, float b);
+float floatmax(float a, float b);
 float sgn(float f);
 
 void sortAlNumCaseInsensitive(char** strings, size_t count);
