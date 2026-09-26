@@ -24,7 +24,7 @@ typedef enum {
 
 void initLocale();
 
-Clay_String* makeApplicationStrings(Languages lang, ImageInfo img);
+Clay_String* makeImageStrings(Languages lang, ImageMetadata img);
 void freeApplicationStrings(Clay_String* s);
 
 /** A function for dynamically allocated strings to be used in the UI */

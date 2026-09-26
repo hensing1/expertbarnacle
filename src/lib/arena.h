@@ -1,4 +1,4 @@
-// Thank you mr zozin
+// thank you mr zozin
 
 // Copyright 2022 Alexey Kutepov <reximkut@gmail.com>
 

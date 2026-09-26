@@ -12,7 +12,7 @@ void initLocale() {
     setlocale(LC_ALL, "");
 }
 
-Clay_String* makeApplicationStrings(Languages lang, ImageInfo img) {
+Clay_String* makeImageStrings(Languages lang, ImageMetadata img) {
     Clay_String* s = malloc(sizeof(Clay_String) * NUM_APPL_STRINGS);
     switch(lang) {
     case LANG_DE:

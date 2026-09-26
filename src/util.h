@@ -3,8 +3,6 @@
 
 #include <stddef.h>
 
-#include <raylib.h>
-
 #define FREE_PTR(ptr) do{ if(ptr) {free(ptr); ptr = NULL;} } while(0)
 
 float absf(float f);

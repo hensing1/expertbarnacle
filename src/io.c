@@ -30,14 +30,14 @@ bool isFile(char* file) {
     return stat(file, &s) == 0 && (s.st_mode & S_IFREG);
 }
 
-ImageInfo loadImageInfo(Image image, const char* filepath) {
+ImageMetadata loadImageInfo(Image image, const char* filepath) {
     struct stat filestat;
     stat(filepath, &filestat);
 
     char* fullPath = malloc(PATH_MAX + 1);
     realpath(filepath, fullPath);
 
-    return (ImageInfo) {
+    return (ImageMetadata) {
         .width = image.width,
         .height = image.height,
         .fileName = GetFileName(filepath),
@@ -47,7 +47,7 @@ ImageInfo loadImageInfo(Image image, const char* filepath) {
     };
 }
 
-void freeImageInfo(ImageInfo image) {
+void freeImageInfo(ImageMetadata image) {
     FREE_PTR(image.fullPath);
 }
 

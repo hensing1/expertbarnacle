@@ -13,7 +13,7 @@ typedef struct {
     char* fullPath;
     size_t sizeBytes;
     time_t timeModifiedUnix;  // unix time stamp, in seconds
-} ImageInfo;
+} ImageMetadata;
 
 typedef struct {
     float deltaTime;
@@ -28,8 +28,8 @@ typedef struct {
 
 InputInfo captureInputs();
 bool isFile(char* path);
-ImageInfo loadImageInfo(Image image, const char* filepath);
-void freeImageInfo(ImageInfo image);
+ImageMetadata loadImageInfo(Image image, const char* filepath);
+void freeImageInfo(ImageMetadata image);
 FilePathList getImagePaths(const char* directory);
 int findInImagePaths(FilePathList paths, char* file);
 

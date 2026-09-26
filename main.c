@@ -22,7 +22,6 @@ const Vector2 initWinDims = {1200, 900};
 
 Vector2 getInitWindowDimensions(Image);
 void handleClayErrors(Clay_ErrorData errors);
-bool isFile(char* path);
 char* parseArgs(int argc, char* argv[]);
 
 int main(int argc, char* argv[]) {
@@ -36,7 +35,7 @@ int main(int argc, char* argv[]) {
     ApplicationState state = initAppState(filePath);
     state.infoScreenOpen = true;
     Image image = LoadImage(filePath);
-    ImageInfo imageInfo = loadImageInfo(image, filePath);
+    ImageMetadata imageInfo = loadImageInfo(image, filePath);
 
     // initialize window and raylib
     Vector2 initWindowDims = getInitWindowDimensions(image);
@@ -70,7 +69,7 @@ int main(int argc, char* argv[]) {
     Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
     Clay__debugViewWidth = 600;
 
-    Clay_String* strings = makeApplicationStrings(LANG_DE, imageInfo);
+    Clay_String* strings = makeImageStrings(LANG_DE, imageInfo);
 
     while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_D)) {
