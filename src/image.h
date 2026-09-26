@@ -9,8 +9,8 @@
 
 typedef struct {
     Arena arena;
-    Image image;
-    ImageMetadata info;
+    Texture2D texture;
+    ImageMetadata metadata;
     Clay_String* strings;
 } ImageData;
 

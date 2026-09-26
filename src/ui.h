@@ -5,18 +5,15 @@
 #include "render.h"
 #include "state.h"
 
-typedef enum
-{
+typedef enum {
     CUSTOM_LAYOUT_ELEMENT_TYPE_MAINIMAGE
 } CustomLayoutElementType;
 
-typedef struct
-{
+typedef struct {
     float zoom;
 } CustomLayoutElement_MainImage;
 
-typedef struct
-{
+typedef struct {
     CustomLayoutElementType type;
     union {
         CustomLayoutElement_MainImage imageRenderParams;

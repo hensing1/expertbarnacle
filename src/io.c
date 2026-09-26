@@ -30,11 +30,11 @@ bool isFile(char* file) {
     return stat(file, &s) == 0 && (s.st_mode & S_IFREG);
 }
 
-ImageMetadata loadImageInfo(Image image, const char* filepath) {
+ImageMetadata loadImageMetadata(Arena* imgArena, Texture2D image, const char* filepath) {
     struct stat filestat;
     stat(filepath, &filestat);
 
-    char* fullPath = malloc(PATH_MAX + 1);
+    char* fullPath = arena_alloc(imgArena, PATH_MAX + 1);
     realpath(filepath, fullPath);
 
     return (ImageMetadata) {
@@ -45,10 +45,6 @@ ImageMetadata loadImageInfo(Image image, const char* filepath) {
         .sizeBytes = filestat.st_size,
         .timeModifiedUnix = filestat.st_mtim.tv_sec,
     };
-}
-
-void freeImageInfo(ImageMetadata image) {
-    FREE_PTR(image.fullPath);
 }
 
 FilePathList getImagePaths(const char* directory) {

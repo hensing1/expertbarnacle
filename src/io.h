@@ -6,6 +6,8 @@
 
 #include <raylib.h>
 
+#include "lib/arena.h"
+
 typedef struct {
     int height;
     int width;
@@ -28,8 +30,7 @@ typedef struct {
 
 InputInfo captureInputs();
 bool isFile(char* path);
-ImageMetadata loadImageInfo(Image image, const char* filepath);
-void freeImageInfo(ImageMetadata image);
+ImageMetadata loadImageMetadata(Arena* imgArena, Texture2D image, const char* filepath);
 FilePathList getImagePaths(const char* directory);
 int findInImagePaths(FilePathList paths, char* file);
 
