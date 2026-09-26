@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 
     // initialize window and raylib
     Vector2 initWindowDims = getInitWindowDimensions(filePath);
-    InitWindow(initWindowDims.x, initWindowDims.y, filePath);
+    InitWindow(initWindowDims.x, initWindowDims.y, "Bildfresser 3000");
     SetWindowMinSize(600, 450);
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
@@ -58,6 +58,7 @@ int main(int argc, char* argv[]) {
     initLocale();
     ApplicationState state = initAppState(filePath);
     ImageData image = loadImage(filePath); 
+    SetWindowTitle(image.metadata.fileName);
 
     while (!WindowShouldClose()) {
         #ifdef DEBUG
@@ -68,15 +69,17 @@ int main(int argc, char* argv[]) {
         if (IsKeyPressed(KEY_I)) {
             state.infoScreenOpen ^= true;
         }
-        if (IsKeyPressed(KEY_LEFT)) {
+        if (IsKeyPressed(KEY_LEFT) && state.currentImgIndex > 0) {
             freeImage(image);
-            state.currentImgIndex = max(0, state.currentImgIndex - 1);
+            state.currentImgIndex--;
             image = loadImage(state.imgFilesInDir.paths[state.currentImgIndex]);
+            SetWindowTitle(image.metadata.fileName);
         }
-        if (IsKeyPressed(KEY_RIGHT)) {
+        if (IsKeyPressed(KEY_RIGHT) && state.currentImgIndex < state.imgFilesInDir.count - 1) {
             freeImage(image);
-            state.currentImgIndex = min(state.imgFilesInDir.count - 1, state.currentImgIndex + 1);
+            state.currentImgIndex++;
             image = loadImage(state.imgFilesInDir.paths[state.currentImgIndex]);
+            SetWindowTitle(image.metadata.fileName);
         }
         InputInfo inputs = captureInputs();
         Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs, image.strings);
@@ -112,7 +115,7 @@ char* parseArgs(int argc, char* argv[]) {
 Vector2 getInitWindowDimensions(char* imagePath) {
     Image image = LoadImage(imagePath); // TODO: find better way to get image dims
     if (!IsImageValid(image)) {
-        return initWinDims;
+        exit(-1);
     }
     float imageAspectRatio = (float)image.width / image.height;
     float width, height;
@@ -124,6 +127,7 @@ Vector2 getInitWindowDimensions(char* imagePath) {
         height = min(image.height, initWinDims.y);
         width = max(height * imageAspectRatio, 400);
     }
+    UnloadImage(image);
     return (Vector2){width, height};
 }
 

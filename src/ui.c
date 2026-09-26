@@ -32,8 +32,8 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
     Clay_UpdateScrollContainers(true, convVec2RaylibClay(inputs.mouseScroll), inputs.deltaTime);
 
     static int sidebarWidth = 300;
-    if (IsKeyDown(KEY_LEFT)) sidebarWidth++;
-    if (IsKeyDown(KEY_RIGHT)) sidebarWidth--;
+    // if (IsKeyDown(KEY_LEFT)) sidebarWidth++;
+    // if (IsKeyDown(KEY_RIGHT)) sidebarWidth--;
     Clay_BeginLayout();
     CLAY(CLAY_ID("Global"), {
         .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)} },
@@ -78,10 +78,35 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
                     infoBox(CLAY_STRING("InfoSidebarBox"), 1, strings[STR_RESOLUTION_TITLE], strings[STR_RESOLUTION]);
                     infoBox(CLAY_STRING("InfoSidebarBox"), 2, strings[STR_FILESIZE_TITLE], strings[STR_FILESIZE]);
                     infoBox(CLAY_STRING("InfoSidebarBox"), 3, strings[STR_TIME_MODIFIED_TITLE], strings[STR_TIME_MODIFIED]);
+                    CLAY(CLAY_ID("InfoSidebarBalloon"), { 
+                        .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} }
+                    });
+                    CLAY(CLAY_ID("InfoSidebarNavContainer"), { 
+                        .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_FIT()} }
+                    }) {
+                        CLAY(CLAY_ID("NavButtonLeft"), {
+                            .layout = { .sizing = {CLAY_SIZING_FIXED(50), CLAY_SIZING_FIXED(50)},
+                                        .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER} },
+                            .border = { .width = CLAY_BORDER_ALL(1),
+                                        .color = C_GRAY },
+                        }) {
+                            CLAY_TEXT(CLAY_STRING("<"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
+                        }
+                        CLAY(CLAY_ID("NavContainerBalloon"), { 
+                            .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} }
+                        });
+                        CLAY(CLAY_ID("NavButtonRight"), {
+                            .layout = { .sizing = {CLAY_SIZING_FIXED(50), CLAY_SIZING_FIXED(50)},
+                                        .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER} },
+                            .border = { .width = CLAY_BORDER_ALL(1),
+                                        .color = C_GRAY },
+                        }) {
+                            CLAY_TEXT(CLAY_STRING(">"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
+                        }
+                    }
                 }
             }
         }
-
     }
     return Clay_EndLayout(inputs.deltaTime);
 }
