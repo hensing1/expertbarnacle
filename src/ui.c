@@ -1,7 +1,5 @@
 #include "ui.h"
 
-#include <stdio.h>
-
 #include <raylib.h>
 #include "lib/clay.h"
 
@@ -26,7 +24,8 @@ void infoBox(Clay_String id, int index, Clay_String title, Clay_String content) 
     }
 }
 
-Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_String* strings) {
+Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo inputs) {
+    Clay_String* strings = state.currentImage.strings;
     Clay_SetLayoutDimensions((Clay_Dimensions){ GetScreenWidth(), GetScreenHeight() });
     Clay_SetPointerState(convVec2RaylibClay(inputs.mousePos), inputs.mouseLeftPressed);
     Clay_UpdateScrollContainers(true, convVec2RaylibClay(inputs.mouseScroll), inputs.deltaTime);
@@ -85,10 +84,11 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
                         .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_FIT()} }
                     }) {
                         CLAY(CLAY_ID("NavButtonLeft"), {
-                            .layout = { .sizing = {CLAY_SIZING_FIXED(50), CLAY_SIZING_FIXED(50)},
+                            .layout = { .sizing = {CLAY_SIZING_FIXED(80), CLAY_SIZING_FIXED(80)},
                                         .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER} },
-                            .border = { .width = CLAY_BORDER_ALL(1),
+                            .border = { .width = CLAY_BORDER_ALL(2),
                                         .color = C_GRAY },
+                            .backgroundColor = {80, 80, 80, Clay_Hovered() ? 255 : 0}
                         }) {
                             CLAY_TEXT(CLAY_STRING("<"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
                         }
@@ -96,10 +96,11 @@ Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_
                             .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} }
                         });
                         CLAY(CLAY_ID("NavButtonRight"), {
-                            .layout = { .sizing = {CLAY_SIZING_FIXED(50), CLAY_SIZING_FIXED(50)},
+                            .layout = { .sizing = {CLAY_SIZING_FIXED(80), CLAY_SIZING_FIXED(80)},
                                         .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER} },
-                            .border = { .width = CLAY_BORDER_ALL(1),
+                            .border = { .width = CLAY_BORDER_ALL(2),
                                         .color = C_GRAY },
+                            .backgroundColor = {80, 80, 80, Clay_Hovered() ? 255 : 0}
                         }) {
                             CLAY_TEXT(CLAY_STRING(">"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
                         }

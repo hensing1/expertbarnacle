@@ -24,6 +24,7 @@ const Vector2 initWinDims = {1200, 900};
 Vector2 getInitWindowDimensions(char* imagePath);
 void handleClayErrors(Clay_ErrorData errors);
 char* parseArgs(int argc, char* argv[]);
+static inline bool isButtonPressed(InputInfo inputs, const char* elementName);
 
 int main(int argc, char* argv[]) {
     char* filePath = parseArgs(argc, argv);
@@ -57,32 +58,11 @@ int main(int argc, char* argv[]) {
 
     initLocale();
     ApplicationState state = initAppState(filePath);
-    ImageData image = loadImage(filePath); 
-    SetWindowTitle(image.metadata.fileName);
+    SetWindowTitle(state.currentImage.metadata.fileName);
 
     while (!WindowShouldClose()) {
-        #ifdef DEBUG
-        if (IsKeyPressed(KEY_D)) {
-            Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
-        }
-        #endif /* ifdef DEBUG */
-        if (IsKeyPressed(KEY_I)) {
-            state.infoScreenOpen ^= true;
-        }
-        if (IsKeyPressed(KEY_LEFT) && state.currentImgIndex > 0) {
-            freeImage(image);
-            state.currentImgIndex--;
-            image = loadImage(state.imgFilesInDir.paths[state.currentImgIndex]);
-            SetWindowTitle(image.metadata.fileName);
-        }
-        if (IsKeyPressed(KEY_RIGHT) && state.currentImgIndex < state.imgFilesInDir.count - 1) {
-            freeImage(image);
-            state.currentImgIndex++;
-            image = loadImage(state.imgFilesInDir.paths[state.currentImgIndex]);
-            SetWindowTitle(image.metadata.fileName);
-        }
         InputInfo inputs = captureInputs();
-        Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs, image.strings);
+        Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs);
 
         Rectangle imageRect = CLAY_RECTANGLE_TO_RAYLIB_RECTANGLE(
             Clay_GetElementData(Clay_GetElementId(CLAY_STRING("ImageContainer"))).boundingBox);
@@ -91,13 +71,33 @@ int main(int argc, char* argv[]) {
         {
             // DrawRectangleRec(imageRect, SLATE);
             Clay_Raylib_Render(uiRenderCommands, fonts);
-            renderImage(image.texture, imageShader, imageRect, inputs);
+            renderImage(state.currentImage.texture, imageShader, imageRect, inputs);
         }
         EndDrawing();
+
+        if ((isButtonPressed(inputs, "NavButtonLeft") || IsKeyPressed(KEY_LEFT)) && state.currentImgIndex > 0) {
+            previousImage(&state);
+        }
+        if ((isButtonPressed(inputs, "NavButtonRight") || IsKeyPressed(KEY_RIGHT)) &&
+            state.currentImgIndex < state.imgFilesInDir.count - 1) {
+            nextImage(&state);
+        }
+        if (IsKeyPressed(KEY_I)) {
+            state.infoScreenOpen ^= true;
+        }
+        #ifdef DEBUG
+        if (IsKeyPressed(KEY_D)) {
+            Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
+        }
+        #endif /* ifdef DEBUG */
     }
-    arena_free(&image.arena);
+    freeImage(state.currentImage);
     CloseWindow();
     return 0;
+}
+
+static inline bool isButtonPressed(InputInfo inputs, const char* elementName) {
+    return inputs.mouseLeftPressed && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
 }
 
 char* parseArgs(int argc, char* argv[]) {

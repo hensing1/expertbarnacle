@@ -21,6 +21,6 @@ typedef struct {
 } CustomLayoutElement;
 
 
-Clay_RenderCommandArray createUI(ApplicationState state, InputInfo inputs, Clay_String* strings);
+Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo inputs);
 
 #endif  // INCLUDE_SRC_UI_H_
