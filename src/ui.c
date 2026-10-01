@@ -24,28 +24,35 @@ void infoBox(Clay_String id, int index, Clay_String title, Clay_String content) 
     }
 }
 
-Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo inputs) {
+Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo inputs, Arena* frameArena) {
     Clay_String* strings = state.currentImage.strings;
     Clay_SetLayoutDimensions((Clay_Dimensions){ GetScreenWidth(), GetScreenHeight() });
     Clay_SetPointerState(convVec2RaylibClay(inputs.mousePos), inputs.mouseLeftPressed);
     Clay_UpdateScrollContainers(true, convVec2RaylibClay(inputs.mouseScroll), inputs.deltaTime);
 
     static int sidebarWidth = 300;
-    // if (IsKeyDown(KEY_LEFT)) sidebarWidth++;
-    // if (IsKeyDown(KEY_RIGHT)) sidebarWidth--;
     Clay_BeginLayout();
     CLAY(CLAY_ID("Global"), {
-        .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)} },
+        .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} },
         .backgroundColor = C_SLATE
     }) {
-        // CustomLayoutElement custom = {
-        //     .type = CUSTOM_LAYOUT_ELEMENT_TYPE_MAINIMAGE,
-        //     .customData.imageRenderParams = { .zoom = 1 }
-        // };
         CLAY(CLAY_ID("ImageContainer"), {
-            .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)} },
-            // .custom = { .customData = &custom }
+            .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()},
+                        .childAlignment = { CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER }
+            },
         }) {
+            CustomLayoutElement* custom = arena_alloc(frameArena, sizeof(CustomLayoutElement));
+            *custom = (CustomLayoutElement){
+                .type = CUSTOM_LAYOUT_ELEMENT_TYPE_MAINIMAGE,
+                .customData.imageRenderData = {
+                    .image = state.currentImage.texture,
+                    .imageRenderParams = state.imageRenderParams
+                }
+            };
+            CLAY(CLAY_ID("Image"), {
+                .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} },
+                .custom = { .customData = custom }
+            });
             // CLAY(CLAY_ID("PrevImage"), {
             //     .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)} },
             //     .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
@@ -64,11 +71,11 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
        
         if (state.infoScreenOpen) {
             CLAY(CLAY_ID("InfoSidebar"), {
-                .layout = { .sizing = {CLAY_SIZING_FIXED(sidebarWidth), CLAY_SIZING_GROW(0)},
+                .layout = { .sizing = {CLAY_SIZING_FIXED(sidebarWidth), CLAY_SIZING_GROW()},
                             .padding = {3, 0, 0, 0} },
             }) {
                 CLAY(CLAY_ID("InfoSidebarInner"), {
-                    .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)},
+                    .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()},
                                 .padding = CLAY_PADDING_ALL(16),
                                 .layoutDirection = CLAY_TOP_TO_BOTTOM,
                                 .childGap = 16},

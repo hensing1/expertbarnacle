@@ -1,8 +1,8 @@
 #ifndef INCLUDE_SRC_UI_H_
 #define INCLUDE_SRC_UI_H_
 
+#include "lib/arena.h"
 #include "lib/clay.h"
-#include "render.h"
 #include "state.h"
 
 typedef enum {
@@ -10,17 +10,18 @@ typedef enum {
 } CustomLayoutElementType;
 
 typedef struct {
-    float zoom;
-} CustomLayoutElement_MainImage;
+    Texture2D image;
+    RenderParams_MainImage imageRenderParams;
+} RenderData_MainImage;
 
 typedef struct {
     CustomLayoutElementType type;
     union {
-        CustomLayoutElement_MainImage imageRenderParams;
+        RenderData_MainImage imageRenderData;
     } customData;
 } CustomLayoutElement;
 
 
-Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo inputs);
+Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo inputs, Arena* frameArena);
 
 #endif  // INCLUDE_SRC_UI_H_

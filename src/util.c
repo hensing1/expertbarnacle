@@ -1,5 +1,6 @@
 #include "util.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,3 +30,12 @@ int compAlNumCaseInsensitive(const void* a, const void* b) {
 void sortAlNumCaseInsensitive(char** strings, size_t count) {
     qsort(strings, count, sizeof(char*), compAlNumCaseInsensitive);
 }
+
+inline Rectangle toRectangle(Clay_BoundingBox box) {
+    return (Rectangle) { .x = box.x, .y = box.y, .width = box.width, .height = box.height };
+}
+
+inline Color toColor(Clay_Color color) {
+    return (Color) { .r = (unsigned char)roundf(color.r), .g = (unsigned char)roundf(color.g), .b = (unsigned char)roundf(color.b), .a = (unsigned char)roundf(color.a) };
+}
+

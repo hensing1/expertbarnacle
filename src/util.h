@@ -3,6 +3,10 @@
 
 #include <stddef.h>
 
+#include <raylib.h>
+
+#include "lib/clay.h"
+
 #define FREE_PTR(ptr) do{ if(ptr) {free(ptr); ptr = NULL;} } while(0)
 #define min(a, b) (a) <= (b) ? (a) : (b)
     // _Generic((a), \
@@ -15,6 +19,11 @@
     //     float: floatmax \
     // )(a, b)
 
+#define TO_RAYLIB(clayElement) _Generic((clayElement), \
+    Clay_BoundingBox: toRectangle, \
+    Clay_Color: toColor \
+)(clayElement)
+
 float absf(float f);
 float clamp(float f, float low, float high);
 int intmin(int a, int b);
@@ -24,5 +33,8 @@ float floatmax(float a, float b);
 float sgn(float f);
 
 void sortAlNumCaseInsensitive(char** strings, size_t count);
+
+Rectangle toRectangle(Clay_BoundingBox box);
+Color toColor(Clay_Color color);
 
 #endif  // INCLUDE_SRC_UTIL_H_

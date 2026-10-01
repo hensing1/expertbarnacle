@@ -7,7 +7,7 @@
 #include "src/format.h"
 #include "src/image.h"
 #include "src/io.h"
-#include "src/render.h"
+#include "src/renderer.h"
 #include "src/state.h"
 #include "src/ui.h"
 #include "src/util.h"
@@ -17,7 +17,6 @@
 
 #define CLAY_IMPLEMENTATION
 #include "src/lib/clay.h"
-#include "src/lib/clay_renderer_raylib.c"
 
 const Vector2 initWinDims = {1200, 900};
 
@@ -37,12 +36,7 @@ int main(int argc, char* argv[]) {
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-    Shader imageShader = LoadShader(0, "src/shaders/image.frag");
-    // int picDimLoc = GetShaderLocation(imageShader, "picSize");
-    // SetShaderValue(imageShader, picDimLoc, &(Vector2) {image.width, image.height}, SHADER_UNIFORM_VEC2);
-    
-    char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-500-normal.ttf";
-    Font fonts[] = {LoadFontEx(fontFile, 28, NULL, 250), LoadFontEx(fontFile, 32, NULL, 250)};
+    initImageShader();
 
     // initialize clay
     uint64_t clayArenaSize = Clay_MinMemorySize();
@@ -52,9 +46,11 @@ int main(int argc, char* argv[]) {
         (Clay_Dimensions){ initWindowDims.x, initWindowDims.y },
         (Clay_ErrorHandler){ handleClayErrors }
     );
-    InitOverlay();
-    Clay_SetMeasureTextFunction(Raylib_MeasureText, fonts);
     Clay__debugViewWidth = 600;
+
+    char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-500-normal.ttf";
+    Font fonts[] = {LoadFontEx(fontFile, 28, NULL, 250), LoadFontEx(fontFile, 32, NULL, 250)};
+    Clay_Raylib_Initialize(fonts);
 
     initLocale();
     ApplicationState state = initAppState(filePath);
@@ -62,42 +58,22 @@ int main(int argc, char* argv[]) {
 
     while (!WindowShouldClose()) {
         InputInfo inputs = captureInputs();
-        Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs);
-
-        Rectangle imageRect = CLAY_RECTANGLE_TO_RAYLIB_RECTANGLE(
-            Clay_GetElementData(Clay_GetElementId(CLAY_STRING("ImageContainer"))).boundingBox);
+        Arena frameArena = {};
+        Clay_RenderCommandArray uiRenderCommands = createUI(state, inputs, &frameArena);
 
         BeginDrawing();
         {
-            // DrawRectangleRec(imageRect, SLATE);
             Clay_Raylib_Render(uiRenderCommands, fonts);
-            renderImage(state.currentImage.texture, imageShader, imageRect, inputs);
         }
         EndDrawing();
 
-        if ((isButtonPressed(inputs, "NavButtonLeft") || IsKeyPressed(KEY_LEFT)) && state.currentImgIndex > 0) {
-            previousImage(&state);
-        }
-        if ((isButtonPressed(inputs, "NavButtonRight") || IsKeyPressed(KEY_RIGHT)) &&
-            state.currentImgIndex < state.imgFilesInDir.count - 1) {
-            nextImage(&state);
-        }
-        if (IsKeyPressed(KEY_I)) {
-            state.infoScreenOpen ^= true;
-        }
-        #ifdef DEBUG
-        if (IsKeyPressed(KEY_D)) {
-            Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
-        }
-        #endif /* ifdef DEBUG */
+        updateState(&state, inputs);
+        arena_free(&frameArena);
     }
     freeImage(state.currentImage);
     CloseWindow();
+    Clay_Raylib_Close();
     return 0;
-}
-
-static inline bool isButtonPressed(InputInfo inputs, const char* elementName) {
-    return inputs.mouseLeftPressed && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
 }
 
 char* parseArgs(int argc, char* argv[]) {
