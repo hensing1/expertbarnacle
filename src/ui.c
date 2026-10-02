@@ -75,11 +75,11 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
             }) {
                 CLAY(CLAY_ID("InfoSidebarHandle"), {
                     .layout = { .sizing = {CLAY_SIZING_FIXED(16), CLAY_SIZING_GROW()}},
-                    .backgroundColor = C_BLACK
+                    .backgroundColor = {30, 29, 36, 255}
                 });
                 CLAY(CLAY_ID("InfoSidebarInner"), {
                     .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()},
-                                .padding = CLAY_PADDING_ALL(16),
+                                .padding = {.top = 16, .right = 16, .bottom = 16, .left = 0},
                                 .layoutDirection = CLAY_TOP_TO_BOTTOM,
                                 .childGap = 16},
                     .backgroundColor = {30, 29, 36, 255}

@@ -52,12 +52,21 @@ static void updateZoom(RenderParams_MainImage* params, InputInfo inputs, Clay_Bo
         return;
     }
 
-    if (sgn(params->zoomSpeed) == -sgn(inputs.mouseScroll.y)) {
-        params->zoomSpeed = 0;
-    }
-    else {
-        params->zoomSpeed *= powf(zoomSpeedDecay, 60.f * GetFrameTime());
-        params->zoomSpeed += zoomSpeedBoost * inputs.mouseScroll.y;
+    params->zoomSpeed *= powf(zoomSpeedDecay, 60.f * GetFrameTime());
+
+    if (CheckCollisionPointRec(inputs.mousePos, TO_RAYLIB(viewport))) {
+        if (sgn(params->zoomSpeed) == -sgn(inputs.mouseScroll.y)) {
+            params->zoomSpeed = 0;
+        }
+        else {
+            params->zoomSpeed += zoomSpeedBoost * inputs.mouseScroll.y;
+        }
+        if (inputs.mouseScroll.y != 0 && params->zoom > 1) {
+            params->zoomCenter = (Vector2) {
+                .x = inputs.mousePos.x - viewport.x,
+                .y = inputs.mousePos.y - viewport.y
+            };
+        }
     }
 
     if (params->zoomSpeed >= 0) {
@@ -67,16 +76,11 @@ static void updateZoom(RenderParams_MainImage* params, InputInfo inputs, Clay_Bo
         params->zoom /= 1 - params->zoomSpeed;
     }
     params->zoom = max(min(params->zoom, 300), 0.1);
-
-    if (inputs.mouseScroll.y != 0 && params->zoom > 1) {
-        params->zoomCenter = (Vector2) {
-            .x = inputs.mousePos.x - viewport.x,
-            .y = inputs.mousePos.y - viewport.y
-        };
-    }
 }
 
-static void updateMainImageParams(RenderParams_MainImage* params, Texture2D tex, InputInfo inputs) {
+static void updateMainImageParams(ApplicationState* state, InputInfo inputs) {
+    RenderParams_MainImage* params = &state->imageRenderParams;
+    Texture2D tex = state->currentImage.texture;
     Clay_BoundingBox viewport =
         Clay_GetElementData(Clay_GetElementId(mkClayString("ImageContainer"))).boundingBox;
 
@@ -105,15 +109,17 @@ static void updateMainImageParams(RenderParams_MainImage* params, Texture2D tex,
     virtImgCrop.width = min(virtImgSize.width, viewport.width);
     virtImgCrop.height = min(virtImgSize.height, viewport.height);
 
-    params->isDragging = params->isDragging ? inputs.mouseLeftDown : 
-        CheckCollisionPointRec(inputs.mousePos, params->imageTarget) &&
-        (virtImgSize.height > viewport.height || virtImgSize.width > viewport.width) &&
-        inputs.mouseLeftDown;
+    if (state->pointerDraggingState == POINTER_DEFAULT &&
+            inputs.mouseLeftDown &&
+            CheckCollisionPointRec(inputs.mousePos, params->imageTarget) &&
+            (virtImgSize.height > viewport.height || virtImgSize.width > viewport.width)) {
+        state->pointerDraggingState = POINTER_DRAGGING_IMAGE;
+    }
 
     // virtImgCrop.width = min(virtImgSize.width, viewport.width);
     // virtImgCrop.height = min(virtImgSize.height, viewport.height);
 
-    if (params->isDragging) {
+    if (state->pointerDraggingState == POINTER_DRAGGING_IMAGE) {
         virtImgCrop.x -= inputs.mouseDelta.x;
         virtImgCrop.y -= inputs.mouseDelta.y;
     }
@@ -189,18 +195,6 @@ void previousImage(ApplicationState* state) {
 }
 
 void updateState(ApplicationState *state, InputInfo inputs) {
-    updateMainImageParams(&state->imageRenderParams, state->currentImage.texture, inputs);
-
-    if (state->imageRenderParams.isDragging)                                        { state->pointerDraggingState = POINTER_DRAGGING_IMAGE; }
-    else if (state->infoScreenOpen && isButtonPressed(inputs, "InfoSidebarHandle")) { state->pointerDraggingState = POINTER_DRAGGING_SIDEBAR; }
-    else if (state->infoScreenOpen && isButtonHovered(inputs, "InfoSidebarHandle")) { state->pointerDraggingState = POINTER_HOVERING_SIDEBAR; }
-    else if (!inputs.mouseLeftDown)                                                 { state->pointerDraggingState = POINTER_DEFAULT; }
-    updatePointer(state->pointerDraggingState);
-
-    if (state->pointerDraggingState == POINTER_DRAGGING_SIDEBAR) {
-        state->infoScreenWidth = clamp(GetRenderWidth() - inputs.mousePos.x + 10, 256, 800);
-    }
-
     if ((isButtonPressed(inputs, "NavButtonLeft") || IsKeyPressed(KEY_LEFT)) && state->currentImgIndex > 0) {
         previousImage(state);
     }
@@ -216,4 +210,20 @@ void updateState(ApplicationState *state, InputInfo inputs) {
         Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
     }
     #endif /* ifdef DEBUG */
+
+    if (state->infoScreenOpen && isButtonPressed(inputs, "InfoSidebarHandle")) {
+        state->pointerDraggingState = POINTER_DRAGGING_SIDEBAR;
+    }
+    else if (state->infoScreenOpen && isButtonHovered(inputs, "InfoSidebarHandle")) {
+        state->pointerDraggingState = POINTER_HOVERING_SIDEBAR;
+    }
+    else if (!inputs.mouseLeftDown) {
+        state->pointerDraggingState = POINTER_DEFAULT;
+    }
+    updateMainImageParams(state, inputs);
+    updatePointer(state->pointerDraggingState);
+
+    if (state->pointerDraggingState == POINTER_DRAGGING_SIDEBAR) {
+        state->infoScreenWidth = clamp(GetRenderWidth() - inputs.mousePos.x, 256, 800);
+    }
 }
