@@ -7,6 +7,13 @@
 
 #include "image.h"
 
+typedef enum {
+    POINTER_DEFAULT,
+    POINTER_DRAGGING_IMAGE,
+    POINTER_HOVERING_SIDEBAR,
+    POINTER_DRAGGING_SIDEBAR
+} PointerState;
+
 typedef struct {
     float zoom;
     float zoomSpeed;
@@ -17,7 +24,9 @@ typedef struct {
 } RenderParams_MainImage;
 
 typedef struct {
+    PointerState pointerDraggingState;
     bool infoScreenOpen;
+    int infoScreenWidth;
     FilePathList imgFilesInDir;
     int currentImgIndex;
     ImageData currentImage;

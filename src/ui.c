@@ -30,7 +30,6 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
     Clay_SetPointerState(convVec2RaylibClay(inputs.mousePos), inputs.mouseLeftPressed);
     Clay_UpdateScrollContainers(true, convVec2RaylibClay(inputs.mouseScroll), inputs.deltaTime);
 
-    static int sidebarWidth = 300;
     Clay_BeginLayout();
     CLAY(CLAY_ID("Global"), {
         .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} },
@@ -71,9 +70,13 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
        
         if (state.infoScreenOpen) {
             CLAY(CLAY_ID("InfoSidebar"), {
-                .layout = { .sizing = {CLAY_SIZING_FIXED(sidebarWidth), CLAY_SIZING_GROW()},
+                .layout = { .sizing = {CLAY_SIZING_FIXED(state.infoScreenWidth), CLAY_SIZING_GROW()},
                             .padding = {3, 0, 0, 0} },
             }) {
+                CLAY(CLAY_ID("InfoSidebarHandle"), {
+                    .layout = { .sizing = {CLAY_SIZING_FIXED(16), CLAY_SIZING_GROW()}},
+                    .backgroundColor = C_BLACK
+                });
                 CLAY(CLAY_ID("InfoSidebarInner"), {
                     .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()},
                                 .padding = CLAY_PADDING_ALL(16),

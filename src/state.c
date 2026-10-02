@@ -9,21 +9,37 @@
 #include "util.h"
 
 ApplicationState initAppState(char* imagePath) {
-    ApplicationState s;
     const char* fileDir = GetDirectoryPath(imagePath);
-    s.imgFilesInDir = getImagePaths(fileDir);
-    s.currentImgIndex = findInImagePaths(s.imgFilesInDir, imagePath);
-    s.currentImage = loadImage(imagePath);
-    s.imageRenderParams.zoom = 1;
-    s.imageRenderParams.imageCrop = (Rectangle) {
-        .width = s.currentImage.texture.width,
-        .height = s.currentImage.texture.height
+    ApplicationState s = {
+        .pointerDraggingState = POINTER_DEFAULT,
+        .infoScreenOpen = false,
+        .infoScreenWidth = 400,
+        .imgFilesInDir = getImagePaths(fileDir),
+        .currentImgIndex = findInImagePaths(s.imgFilesInDir, imagePath),
+        .currentImage = loadImage(imagePath),
+
+        .imageRenderParams = {
+            .zoom = 1,
+            .zoomSpeed = 0,
+            .imageCrop = (Rectangle) {
+                .width = s.currentImage.texture.width,
+                .height = s.currentImage.texture.height
+            }
+        }
     };
     return s;
 }
 
 static inline bool isButtonPressed(InputInfo inputs, const char* elementName) {
     return inputs.mouseLeftPressed && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
+}
+
+static inline bool isButtonHeld(InputInfo inputs, const char* elementName) {
+    return inputs.mouseLeftDown && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
+}
+
+static inline bool isButtonHovered(InputInfo inputs, const char* elementName) {
+    return !inputs.mouseLeftDown && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
 }
 
 static const float zoomSpeedBoost = 0.02f;
@@ -100,14 +116,10 @@ static void updateMainImageParams(RenderParams_MainImage* params, Texture2D tex,
     if (params->isDragging) {
         virtImgCrop.x -= inputs.mouseDelta.x;
         virtImgCrop.y -= inputs.mouseDelta.y;
-        SetMouseCursor(MOUSE_CURSOR_RESIZE_ALL);
     }
     // if (params->isDragging) {
     //     params->zoomSpeed = 0;
     // }
-    else {
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-    }
 
     virtImgCrop.x = clamp(virtImgCrop.x, 0, virtImgSize.width - virtImgCrop.width);
     virtImgCrop.y = clamp(virtImgCrop.y, 0, virtImgSize.height - virtImgCrop.height);
@@ -131,26 +143,23 @@ static void updateMainImageParams(RenderParams_MainImage* params, Texture2D tex,
         .x = viewport.x + (viewport.width - virtImgCrop.width) / 2,
         .y = viewport.y + (viewport.height - virtImgCrop.height) / 2,
     };
-
 }
 
-void updateState(ApplicationState *state, InputInfo inputs) {
-    updateMainImageParams(&state->imageRenderParams, state->currentImage.texture, inputs);
-    if ((isButtonPressed(inputs, "NavButtonLeft") || IsKeyPressed(KEY_LEFT)) && state->currentImgIndex > 0) {
-        previousImage(state);
+void updatePointer(PointerState pointerState) {
+    switch (pointerState) {
+        case POINTER_DEFAULT:
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+            break;
+        case POINTER_DRAGGING_IMAGE:
+            SetMouseCursor(MOUSE_CURSOR_RESIZE_ALL);
+            break;
+        case POINTER_HOVERING_SIDEBAR:
+        case POINTER_DRAGGING_SIDEBAR:
+            SetMouseCursor(MOUSE_CURSOR_RESIZE_EW);
+            break;
+        default:
+            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
     }
-    if ((isButtonPressed(inputs, "NavButtonRight") || IsKeyPressed(KEY_RIGHT)) &&
-        state->currentImgIndex < state->imgFilesInDir.count - 1) {
-        nextImage(state);
-    }
-    if (IsKeyPressed(KEY_I)) {
-        state->infoScreenOpen ^= true;
-    }
-    #ifdef DEBUG
-    if (IsKeyPressed(KEY_D)) {
-        Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
-    }
-    #endif /* ifdef DEBUG */
 }
 
 void nextImage(ApplicationState* state) {
@@ -177,4 +186,34 @@ void previousImage(ApplicationState* state) {
     state->imageRenderParams.imageCrop = (Rectangle){
         .x = 0, .y = 0, .width = state->currentImage.texture.width, .height = state->currentImage.texture.height};
     SetWindowTitle(state->currentImage.metadata.fileName);
+}
+
+void updateState(ApplicationState *state, InputInfo inputs) {
+    updateMainImageParams(&state->imageRenderParams, state->currentImage.texture, inputs);
+
+    if (state->imageRenderParams.isDragging)                                        { state->pointerDraggingState = POINTER_DRAGGING_IMAGE; }
+    else if (state->infoScreenOpen && isButtonPressed(inputs, "InfoSidebarHandle")) { state->pointerDraggingState = POINTER_DRAGGING_SIDEBAR; }
+    else if (state->infoScreenOpen && isButtonHovered(inputs, "InfoSidebarHandle")) { state->pointerDraggingState = POINTER_HOVERING_SIDEBAR; }
+    else if (!inputs.mouseLeftDown)                                                 { state->pointerDraggingState = POINTER_DEFAULT; }
+    updatePointer(state->pointerDraggingState);
+
+    if (state->pointerDraggingState == POINTER_DRAGGING_SIDEBAR) {
+        state->infoScreenWidth = clamp(GetRenderWidth() - inputs.mousePos.x + 10, 256, 800);
+    }
+
+    if ((isButtonPressed(inputs, "NavButtonLeft") || IsKeyPressed(KEY_LEFT)) && state->currentImgIndex > 0) {
+        previousImage(state);
+    }
+    if ((isButtonPressed(inputs, "NavButtonRight") || IsKeyPressed(KEY_RIGHT)) &&
+        state->currentImgIndex < state->imgFilesInDir.count - 1) {
+        nextImage(state);
+    }
+    if (IsKeyPressed(KEY_I)) {
+        state->infoScreenOpen ^= true;
+    }
+    #ifdef DEBUG
+    if (IsKeyPressed(KEY_D)) {
+        Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
+    }
+    #endif /* ifdef DEBUG */
 }
