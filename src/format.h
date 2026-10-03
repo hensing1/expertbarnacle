@@ -14,6 +14,8 @@ typedef enum {
 } Languages;
 
 typedef enum {
+    STR_INFO_OPEN,
+    STR_INFO_CLOSED,
     STR_RESOLUTION_TITLE,
     STR_RESOLUTION,
     STR_FILESIZE_TITLE,

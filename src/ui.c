@@ -56,8 +56,9 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                 .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)},
                             .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER}},
                 .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
-                              .attachPoints = { .element = CLAY_ATTACH_POINT_LEFT_CENTER, .parent = CLAY_ATTACH_POINT_LEFT_CENTER},
-                              .offset.x = 32 },
+                              .attachPoints = { .element = CLAY_ATTACH_POINT_LEFT_CENTER,
+                                                .parent = CLAY_ATTACH_POINT_LEFT_CENTER},
+                                                .offset.x = 32 },
                 .border = { .width = CLAY_BORDER_ALL(2),
                             .color = C_GRAY },
                 .backgroundColor = Clay_Hovered() ? 
@@ -70,8 +71,9 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                 .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)},
                             .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER}},
                 .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
-                              .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_CENTER, .parent = CLAY_ATTACH_POINT_RIGHT_CENTER},
-                              .offset.x = -32 },
+                              .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_CENTER,
+                                                .parent = CLAY_ATTACH_POINT_RIGHT_CENTER},
+                                                .offset.x = -32 },
                 .border = { .width = CLAY_BORDER_ALL(2),
                             .color = C_GRAY },
                 .backgroundColor = Clay_Hovered() ? 
@@ -80,7 +82,22 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
             }) {
                 CLAY_TEXT(CLAY_STRING(">"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
             }
-
+            CLAY(CLAY_ID("InfoSidebarButton"), {
+                .layout = { .sizing = {CLAY_SIZING_FIT(), CLAY_SIZING_FIT()},
+                            .padding = CLAY_PADDING_ALL(8)},
+                .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
+                              .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_TOP,
+                                                .parent = CLAY_ATTACH_POINT_RIGHT_TOP},
+                                                .offset = {-16, 16} },
+                .border = { .width = CLAY_BORDER_ALL(2),
+                            .color = C_GRAY },
+                .backgroundColor = Clay_Hovered() ? 
+                    (Clay_Color){80, 80, 80, 255} :
+                    C_SLATE
+            }) {
+                CLAY_TEXT(state.infoScreenOpen ? strings[STR_INFO_OPEN]: strings[STR_INFO_CLOSED],
+                          { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
+            }
         }
        
         if (state.infoScreenOpen) {

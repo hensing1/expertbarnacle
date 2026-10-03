@@ -16,6 +16,9 @@ Clay_String* makeImageStrings(Arena* imgArena, Languages lang, ImageMetadata img
     Clay_String* s = arena_alloc(imgArena, sizeof(Clay_String) * NUM_APPL_STRINGS);
     switch(lang) {
     case LANG_DE:
+        s[STR_INFO_OPEN] = CLAY_STRING("[i]nfo >");
+        s[STR_INFO_CLOSED] = CLAY_STRING("[i]nfo <");
+
         s[STR_RESOLUTION_TITLE] = CLAY_STRING("Auflösung");
         s[STR_RESOLUTION] = fmtClayString(imgArena, "%d x %d", img.width, img.height);
         s[STR_FILESIZE_TITLE] = CLAY_STRING("Dateigröße");

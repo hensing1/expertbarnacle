@@ -202,8 +202,11 @@ void updateState(ApplicationState *state, InputInfo inputs) {
         state->currentImgIndex < state->imgFilesInDir.count - 1) {
         nextImage(state);
     }
-    if (IsKeyPressed(KEY_I)) {
+    if (isButtonPressed(inputs, "InfoSidebarButton") || IsKeyPressed(KEY_I)) {
         state->infoScreenOpen ^= true;
+    }
+    if (IsKeyPressed(KEY_F11)) {
+        ToggleBorderlessWindowed();
     }
     #ifdef DEBUG
     if (IsKeyPressed(KEY_D)) {
@@ -226,4 +229,5 @@ void updateState(ApplicationState *state, InputInfo inputs) {
     if (state->pointerDraggingState == POINTER_DRAGGING_SIDEBAR) {
         state->infoScreenWidth = clamp(GetRenderWidth() - inputs.mousePos.x, 256, 800);
     }
+    state->infoScreenWidth = min(state->infoScreenWidth, GetRenderWidth() - 300);
 }
