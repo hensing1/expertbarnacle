@@ -48,7 +48,8 @@ int main(int argc, char* argv[]) {
     );
     Clay__debugViewWidth = 600;
 
-    char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-500-normal.ttf";
+    // char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-500-normal.ttf";
+    char* fontFile = "./res/fonts/Libron/Libron-Regular.ttf";
     Font fonts[] = {LoadFontEx(fontFile, 28, NULL, 250), LoadFontEx(fontFile, 32, NULL, 250)};
     Clay_Raylib_Initialize(fonts);
 
