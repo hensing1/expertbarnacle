@@ -52,20 +52,35 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                 .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} },
                 .custom = { .customData = custom }
             });
-            // CLAY(CLAY_ID("PrevImage"), {
-            //     .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)} },
-            //     .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
-            //                   .attachPoints = { .element = CLAY_ATTACH_POINT_LEFT_CENTER, .parent = CLAY_ATTACH_POINT_LEFT_CENTER},
-            //                   .offset.x = 32 },
-            //     .backgroundColor = GREEN
-            // }) {}
-            // CLAY(CLAY_ID("NextImage"), {
-            //     .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)} },
-            //     .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
-            //                   .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_CENTER, .parent = CLAY_ATTACH_POINT_RIGHT_CENTER},
-            //                   .offset.x = -32 },
-            //     .backgroundColor = GREEN
-            // }) {}
+            CLAY(CLAY_ID("NavButtonLeft"), {
+                .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)},
+                            .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER}},
+                .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
+                              .attachPoints = { .element = CLAY_ATTACH_POINT_LEFT_CENTER, .parent = CLAY_ATTACH_POINT_LEFT_CENTER},
+                              .offset.x = 32 },
+                .border = { .width = CLAY_BORDER_ALL(2),
+                            .color = C_GRAY },
+                .backgroundColor = Clay_Hovered() ? 
+                    (Clay_Color){80, 80, 80, 255} :
+                    C_SLATE
+            }) {
+                CLAY_TEXT(CLAY_STRING("<"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
+            }
+            CLAY(CLAY_ID("NavButtonRight"), {
+                .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)},
+                            .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER}},
+                .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
+                              .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_CENTER, .parent = CLAY_ATTACH_POINT_RIGHT_CENTER},
+                              .offset.x = -32 },
+                .border = { .width = CLAY_BORDER_ALL(2),
+                            .color = C_GRAY },
+                .backgroundColor = Clay_Hovered() ? 
+                    (Clay_Color){80, 80, 80, 255} :
+                    C_SLATE
+            }) {
+                CLAY_TEXT(CLAY_STRING(">"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
+            }
+
         }
        
         if (state.infoScreenOpen) {
@@ -90,31 +105,6 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                     CLAY(CLAY_ID("InfoSidebarBalloon"), { 
                         .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} }
                     });
-                    CLAY(CLAY_ID("InfoSidebarNavContainer"), { 
-                        .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_FIT()} }
-                    }) {
-                        CLAY(CLAY_ID("NavButtonLeft"), {
-                            .layout = { .sizing = {CLAY_SIZING_FIXED(80), CLAY_SIZING_FIXED(80)},
-                                        .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER} },
-                            .border = { .width = CLAY_BORDER_ALL(2),
-                                        .color = C_GRAY },
-                            .backgroundColor = {80, 80, 80, Clay_Hovered() ? 255 : 0}
-                        }) {
-                            CLAY_TEXT(CLAY_STRING("<"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
-                        }
-                        CLAY(CLAY_ID("NavContainerBalloon"), { 
-                            .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} }
-                        });
-                        CLAY(CLAY_ID("NavButtonRight"), {
-                            .layout = { .sizing = {CLAY_SIZING_FIXED(80), CLAY_SIZING_FIXED(80)},
-                                        .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER} },
-                            .border = { .width = CLAY_BORDER_ALL(2),
-                                        .color = C_GRAY },
-                            .backgroundColor = {80, 80, 80, Clay_Hovered() ? 255 : 0}
-                        }) {
-                            CLAY_TEXT(CLAY_STRING(">"), { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
-                        }
-                    }
                 }
             }
         }
