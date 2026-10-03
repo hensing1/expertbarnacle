@@ -10,23 +10,30 @@
 
 ApplicationState initAppState(char* imagePath) {
     const char* fileDir = GetDirectoryPath(imagePath);
-    ApplicationState s = {
-        .pointerDraggingState = POINTER_DEFAULT,
-        .infoScreenOpen = false,
-        .infoScreenWidth = 400,
-        .imgFilesInDir = getImagePaths(fileDir),
-        .currentImgIndex = findInImagePaths(s.imgFilesInDir, imagePath),
-        .currentImage = loadImage(imagePath),
+    int monitor = GetCurrentMonitor();
+    ApplicationState s = {};
 
-        .imageRenderParams = {
-            .zoom = 1,
-            .zoomSpeed = 0,
-            .imageCrop = (Rectangle) {
-                .width = s.currentImage.texture.width,
-                .height = s.currentImage.texture.height
-            }
-        }
+    s.prevWindowDims = (Vector2) {GetMonitorWidth(monitor), GetMonitorHeight(monitor)},
+
+    s.pointerDraggingState = POINTER_DEFAULT,
+    s.infoScreenOpen = false,
+    s.infoScreenWidth = 400,
+    s.imgFilesInDir = getImagePaths(fileDir),
+    s.currentImgIndex = findInImagePaths(s.imgFilesInDir, imagePath),
+    s.currentImage = loadImage(imagePath);;
+
+    s.imageRenderParams = (RenderParams_MainImage){
+        .zoom = 1,
+        .zoomSpeed = 0,
+        .zoomCenter = {},
+        .isDragging = false,
+        .imageCrop = (Rectangle) {
+            .width = s.currentImage.texture.width,
+            .height = s.currentImage.texture.height
+        },
+        .imageTarget = {}
     };
+
     return s;
 }
 
@@ -205,8 +212,29 @@ void updateState(ApplicationState *state, InputInfo inputs) {
     if (isButtonPressed(inputs, "InfoSidebarButton") || IsKeyPressed(KEY_I)) {
         state->infoScreenOpen ^= true;
     }
+    static int numframessincereturnedfromfullscreen = 0; // this is the worst code ever written
+    if (numframessincereturnedfromfullscreen == 3) {
+        SetWindowFocused(); numframessincereturnedfromfullscreen = 0;}
+    if (numframessincereturnedfromfullscreen > 0) {numframessincereturnedfromfullscreen++;}
     if (IsKeyPressed(KEY_F11)) {
-        ToggleBorderlessWindowed();
+        if (!IsWindowFullscreen()) {
+            SetWindowState(FLAG_BORDERLESS_WINDOWED_MODE); // awful hack - GetScreenHeight *includes* the
+                                            // size of window decorations, whereas SetWindowSize does not
+            state->prevWindowDims = (Vector2) {GetScreenWidth(), GetRenderHeight()};
+            // ClearWindowState(FLAG_BORDERLESS_WINDOWED_MODE); // clearing this flag immediately breaks
+                                                                // everything
+            int monitor = GetCurrentMonitor();
+            SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
+            ToggleFullscreen();
+        }
+        else {
+            SetWindowSize(state->prevWindowDims.x, state->prevWindowDims.y);
+            ToggleFullscreen();
+            ClearWindowState(FLAG_BORDERLESS_WINDOWED_MODE);
+            numframessincereturnedfromfullscreen++;
+            SetWindowFocused(); // exiting borderless window mode makes the window lose focus
+                                // and this fucking call does nothing for some reason
+        }
     }
     #ifdef DEBUG
     if (IsKeyPressed(KEY_D)) {

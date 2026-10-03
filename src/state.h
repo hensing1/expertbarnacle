@@ -24,6 +24,8 @@ typedef struct {
 } RenderParams_MainImage;
 
 typedef struct {
+    Vector2 prevWindowDims;
+
     PointerState pointerDraggingState;
     bool infoScreenOpen;
     int infoScreenWidth;
