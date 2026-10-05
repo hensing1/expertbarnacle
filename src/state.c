@@ -13,14 +13,16 @@ ApplicationState initAppState(char* imagePath) {
     int monitor = GetCurrentMonitor();
     ApplicationState s = {};
 
-    s.prevWindowDims = (Vector2) {GetMonitorWidth(monitor), GetMonitorHeight(monitor)},
+    s.prevWindowDims = (Vector2) {GetMonitorWidth(monitor), GetMonitorHeight(monitor)};
+    s.timeSinceMouseMovement = 0.f;
 
-    s.pointerDraggingState = POINTER_DEFAULT,
-    s.infoScreenOpen = false,
-    s.infoScreenWidth = 400,
-    s.imgFilesInDir = getImagePaths(fileDir),
-    s.currentImgIndex = findInImagePaths(s.imgFilesInDir, imagePath),
-    s.currentImage = loadImage(imagePath);;
+    s.pointerDraggingState = POINTER_DEFAULT;
+    s.infoScreenOpen = false;
+    s.infoScreenWidth = 400;
+
+    s.imgFilesInDir = getImagePaths(fileDir);
+    s.currentImgIndex = findInImagePaths(s.imgFilesInDir, imagePath);
+    s.currentImage = loadImage(imagePath);
 
     s.imageRenderParams = (RenderParams_MainImage){
         .zoom = 1,
@@ -232,7 +234,7 @@ void updateState(ApplicationState *state, InputInfo inputs) {
             ToggleFullscreen();
             ClearWindowState(FLAG_BORDERLESS_WINDOWED_MODE);
             numframessincereturnedfromfullscreen++;
-            SetWindowFocused(); // exiting borderless window mode makes the window lose focus
+            // SetWindowFocused(); // exiting borderless window mode makes the window lose focus
                                 // and this fucking call does nothing for some reason
         }
     }
@@ -258,4 +260,11 @@ void updateState(ApplicationState *state, InputInfo inputs) {
         state->infoScreenWidth = clamp(GetRenderWidth() - inputs.mousePos.x, 256, 800);
     }
     state->infoScreenWidth = min(state->infoScreenWidth, GetRenderWidth() - 300);
+
+    if (inputs.mouseDelta.x == 0 && inputs.mouseDelta.y == 0) {
+        state->timeSinceMouseMovement += inputs.deltaTime;
+    }
+    else {
+        state->timeSinceMouseMovement = 0;
+    }
 }

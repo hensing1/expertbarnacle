@@ -5,6 +5,7 @@
 #include "lib/clay.h"
 
 #define CONV_COLOR_RAYLIB_CLAY(rl) (Clay_Color){rl.r, rl.g, rl.b, rl.a}
+#define CHANGE_ALPHA(color, alpha) (Clay_Color){color.r, color.g, color.b, alpha}
 
 #define SLATE (Color){43, 41, 51, 255}
 #define MINTLEAF (Color){99, 163, 117, 255}

@@ -25,6 +25,7 @@ typedef struct {
 
 typedef struct {
     Vector2 prevWindowDims;
+    float timeSinceMouseMovement;
 
     PointerState pointerDraggingState;
     bool infoScreenOpen;
