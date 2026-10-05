@@ -24,11 +24,9 @@ typedef struct {
 } RenderParams_MainImage;
 
 typedef struct {
-    Vector2 prevWindowDims;
-    float timeSinceMouseMovement;
-
     PointerState pointerDraggingState;
-    bool infoScreenOpen;
+    bool isSidebarOpen;
+    bool isImageUiVisible;
     int infoScreenWidth;
     FilePathList imgFilesInDir;
     int currentImgIndex;

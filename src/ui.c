@@ -49,11 +49,11 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
             },
             .custom = { .customData = custom },
         }) {
-            float overlayAlpha = Clay_Hovered() && state.timeSinceMouseMovement < 2 ? 255 : 0;
+            float overlayAlpha = state.isImageUiVisible ? 255 : 0;
             Clay_TransitionElementConfig overlayTransition = {
                 .handler = Clay_EaseOut,
                 .properties = CLAY_TRANSITION_PROPERTY_BACKGROUND_COLOR,
-                .duration = 0.4f
+                .duration = state.isImageUiVisible ? 0.1f : 0.8f
             };
             
             CLAY(CLAY_ID("NavButtonLeft"), {
@@ -107,12 +107,12 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                     CHANGE_ALPHA(C_SLATE, overlayAlpha),
                 .transition = overlayTransition
             }) {
-                CLAY_TEXT(state.infoScreenOpen ? strings[STR_INFO_OPEN]: strings[STR_INFO_CLOSED],
+                CLAY_TEXT(state.isSidebarOpen ? strings[STR_INFO_OPEN]: strings[STR_INFO_CLOSED],
                     { .textColor = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha), .fontId = 0, .fontSize = 28 });
             }
         }
        
-        if (state.infoScreenOpen) {
+        if (state.isSidebarOpen) {
             CLAY(CLAY_ID("InfoSidebar"), {
                 .layout = { .sizing = {CLAY_SIZING_FIXED(state.infoScreenWidth), CLAY_SIZING_GROW()},
                             .padding = {3, 0, 0, 0} },

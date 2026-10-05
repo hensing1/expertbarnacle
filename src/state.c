@@ -13,11 +13,8 @@ ApplicationState initAppState(char* imagePath) {
     int monitor = GetCurrentMonitor();
     ApplicationState s = {};
 
-    s.prevWindowDims = (Vector2) {GetMonitorWidth(monitor), GetMonitorHeight(monitor)};
-    s.timeSinceMouseMovement = 0.f;
-
     s.pointerDraggingState = POINTER_DEFAULT;
-    s.infoScreenOpen = false;
+    s.isSidebarOpen = false;
     s.infoScreenWidth = 400;
 
     s.imgFilesInDir = getImagePaths(fileDir);
@@ -177,6 +174,26 @@ void updatePointer(PointerState pointerState) {
     }
 }
 
+void setImageUiOpacity(ApplicationState* state, InputInfo inputs) {
+    static float timeSinceLastUiInteraction = 0;
+    static bool wasSidebarOpen = false;
+    
+    Rectangle imgViewport = 
+        TO_RAYLIB(Clay_GetElementData(Clay_GetElementId(mkClayString("ImageContainer"))).boundingBox);
+
+    // TODO: keep visibility if currently hovering over an image UI button
+    if (!IsCursorOnScreen() || !CheckCollisionPointRec(inputs.mousePos, imgViewport) || 
+            (state->isSidebarOpen == wasSidebarOpen && 
+             inputs.mouseDelta.x == 0 && inputs.mouseDelta.y == 0 && state->imageRenderParams.zoomSpeed == 0)) {
+        timeSinceLastUiInteraction += inputs.deltaTime;
+    }
+    else {
+        timeSinceLastUiInteraction = 0;
+        wasSidebarOpen = state->isSidebarOpen;
+    }
+    state->isImageUiVisible = timeSinceLastUiInteraction < 2.f;
+}
+
 void nextImage(ApplicationState* state) {
     if (state->currentImgIndex == state->imgFilesInDir.count - 1) {
         return;
@@ -204,6 +221,7 @@ void previousImage(ApplicationState* state) {
 }
 
 void updateState(ApplicationState *state, InputInfo inputs) {
+    // -- <UI navigation>
     if ((isButtonPressed(inputs, "NavButtonLeft") || IsKeyPressed(KEY_LEFT)) && state->currentImgIndex > 0) {
         previousImage(state);
     }
@@ -212,17 +230,21 @@ void updateState(ApplicationState *state, InputInfo inputs) {
         nextImage(state);
     }
     if (isButtonPressed(inputs, "InfoSidebarButton") || IsKeyPressed(KEY_I)) {
-        state->infoScreenOpen ^= true;
+        state->isSidebarOpen ^= true;
     }
+    // -- </UI navigation>
+
+    // -- <fullscreen> --
     static int numframessincereturnedfromfullscreen = 0; // this is the worst code ever written
     if (numframessincereturnedfromfullscreen == 3) {
         SetWindowFocused(); numframessincereturnedfromfullscreen = 0;}
     if (numframessincereturnedfromfullscreen > 0) {numframessincereturnedfromfullscreen++;}
     if (IsKeyPressed(KEY_F11)) {
+        static Vector2 prevWindowDims = {};
         if (!IsWindowFullscreen()) {
             SetWindowState(FLAG_BORDERLESS_WINDOWED_MODE); // awful hack - GetScreenHeight *includes* the
                                             // size of window decorations, whereas SetWindowSize does not
-            state->prevWindowDims = (Vector2) {GetScreenWidth(), GetRenderHeight()};
+            prevWindowDims = (Vector2) {GetScreenWidth(), GetRenderHeight()};
             // ClearWindowState(FLAG_BORDERLESS_WINDOWED_MODE); // clearing this flag immediately breaks
                                                                 // everything
             int monitor = GetCurrentMonitor();
@@ -230,7 +252,7 @@ void updateState(ApplicationState *state, InputInfo inputs) {
             ToggleFullscreen();
         }
         else {
-            SetWindowSize(state->prevWindowDims.x, state->prevWindowDims.y);
+            SetWindowSize(prevWindowDims.x, prevWindowDims.y);
             ToggleFullscreen();
             ClearWindowState(FLAG_BORDERLESS_WINDOWED_MODE);
             numframessincereturnedfromfullscreen++;
@@ -238,33 +260,35 @@ void updateState(ApplicationState *state, InputInfo inputs) {
                                 // and this fucking call does nothing for some reason
         }
     }
+    // -- </fullscreen> --
+
     #ifdef DEBUG
     if (IsKeyPressed(KEY_D)) {
         Clay_SetDebugModeEnabled(!Clay_IsDebugModeEnabled());
     }
     #endif /* ifdef DEBUG */
 
-    if (state->infoScreenOpen && isButtonPressed(inputs, "InfoSidebarHandle")) {
+    setImageUiOpacity(state, inputs);
+
+    // -- <updating pointer> --
+    if (state->isSidebarOpen && isButtonPressed(inputs, "InfoSidebarHandle")) {
         state->pointerDraggingState = POINTER_DRAGGING_SIDEBAR;
     }
-    else if (state->infoScreenOpen && isButtonHovered(inputs, "InfoSidebarHandle")) {
+    else if (state->isSidebarOpen && isButtonHovered(inputs, "InfoSidebarHandle")) {
         state->pointerDraggingState = POINTER_HOVERING_SIDEBAR;
     }
     else if (!inputs.mouseLeftDown) {
         state->pointerDraggingState = POINTER_DEFAULT;
     }
+    // -- <updating image> --
     updateMainImageParams(state, inputs);
+    // -- </updating image> --
+
     updatePointer(state->pointerDraggingState);
+    // -- </updating pointer> --
 
     if (state->pointerDraggingState == POINTER_DRAGGING_SIDEBAR) {
         state->infoScreenWidth = clamp(GetRenderWidth() - inputs.mousePos.x, 256, 800);
     }
     state->infoScreenWidth = min(state->infoScreenWidth, GetRenderWidth() - 300);
-
-    if (inputs.mouseDelta.x == 0 && inputs.mouseDelta.y == 0) {
-        state->timeSinceMouseMovement += inputs.deltaTime;
-    }
-    else {
-        state->timeSinceMouseMovement = 0;
-    }
 }
