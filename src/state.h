@@ -27,7 +27,7 @@ typedef struct {
     PointerState pointerDraggingState;
     bool isSidebarOpen;
     bool isImageUiVisible;
-    int infoScreenWidth;
+    int sidebarWidth;
     FilePathList imgFilesInDir;
     int currentImgIndex;
     ImageData currentImage;

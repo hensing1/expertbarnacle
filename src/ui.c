@@ -112,11 +112,14 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
             }
         }
        
-        if (state.isSidebarOpen) {
-            CLAY(CLAY_ID("InfoSidebar"), {
-                .layout = { .sizing = {CLAY_SIZING_FIXED(state.infoScreenWidth), CLAY_SIZING_GROW()},
-                            .padding = {3, 0, 0, 0} },
-            }) {
+        CLAY(CLAY_ID("InfoSidebar"), {
+            .layout = { .sizing = {CLAY_SIZING_FIXED(state.isSidebarOpen ? state.sidebarWidth : 0), CLAY_SIZING_GROW()},
+                        .padding = {3, 0, 0, 0} },
+            .transition = { .handler = Clay_EaseOut,
+                            .duration = state.pointerDraggingState == POINTER_DRAGGING_SIDEBAR ? 0.f : .3f,
+                            .properties = CLAY_TRANSITION_PROPERTY_WIDTH }
+        }) {
+            if (state.isSidebarOpen) {
                 CLAY(CLAY_ID("InfoSidebarHandle"), {
                     .layout = { .sizing = {CLAY_SIZING_FIXED(16), CLAY_SIZING_GROW()}},
                     .backgroundColor = {30, 29, 36, 255}

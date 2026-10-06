@@ -15,7 +15,7 @@ ApplicationState initAppState(char* imagePath) {
 
     s.pointerDraggingState = POINTER_DEFAULT;
     s.isSidebarOpen = false;
-    s.infoScreenWidth = 400;
+    s.sidebarWidth = 400;
 
     s.imgFilesInDir = getImagePaths(fileDir);
     s.currentImgIndex = findInImagePaths(s.imgFilesInDir, imagePath);
@@ -288,7 +288,7 @@ void updateState(ApplicationState *state, InputInfo inputs) {
     // -- </updating pointer> --
 
     if (state->pointerDraggingState == POINTER_DRAGGING_SIDEBAR) {
-        state->infoScreenWidth = clamp(GetRenderWidth() - inputs.mousePos.x, 256, 800);
+        state->sidebarWidth = clamp(GetRenderWidth() - inputs.mousePos.x, 256, 800);
     }
-    state->infoScreenWidth = min(state->infoScreenWidth, GetRenderWidth() - 300);
+    state->sidebarWidth = min(state->sidebarWidth, GetRenderWidth() - 300);
 }
