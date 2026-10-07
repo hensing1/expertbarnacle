@@ -4,6 +4,7 @@
 
 #include "raylib.h"
 
+#include "src/fonts.h"
 #include "src/format.h"
 #include "src/image.h"
 #include "src/io.h"
@@ -23,7 +24,6 @@ const Vector2 initWinDims = {1200, 900};
 Vector2 getInitWindowDimensions(char* imagePath);
 void handleClayErrors(Clay_ErrorData errors);
 char* parseArgs(int argc, char* argv[]);
-static inline bool isButtonPressed(InputInfo inputs, const char* elementName);
 
 int main(int argc, char* argv[]) {
     char* filePath = parseArgs(argc, argv);
@@ -48,10 +48,11 @@ int main(int argc, char* argv[]) {
     );
     Clay__debugViewWidth = 600;
 
-    // char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-500-normal.ttf";
-    char* fontFile = "./res/fonts/Libron/Libron-Regular.ttf";
-    Font fonts[] = {LoadFontEx(fontFile, 28, NULL, 250), LoadFontEx(fontFile, 32, NULL, 250)};
-    Clay_Raylib_Initialize(fonts);
+    char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-400-normal.ttf";
+    // char* fontFile = "./res/fonts/Libron/Libron-Regular.ttf";
+    // char* fontFile = "./res/fonts/ia-writer-quattro/ia-writer-quattro-latin-400-normal.ttf";
+    initFont(fontFile);
+    Clay_Raylib_Initialize(NULL);
 
     initLocale();
     ApplicationState state = initAppState(filePath);
@@ -64,13 +65,14 @@ int main(int argc, char* argv[]) {
 
         BeginDrawing();
         {
-            Clay_Raylib_Render(uiRenderCommands, fonts);
+            Clay_Raylib_Render(uiRenderCommands);
         }
         EndDrawing();
 
         updateState(&state, inputs);
         arena_free(&frameArena);
     }
+
     freeImage(state.currentImage);
     CloseWindow();
     Clay_Raylib_Close();

@@ -31,6 +31,7 @@ typedef struct {
 InputInfo captureInputs();
 bool isFile(char* path);
 ImageMetadata loadImageMetadata(Arena* imgArena, Texture2D image, const char* filepath);
+size_t loadFileAsBytes(const char* filepath, unsigned char** data);
 FilePathList getImagePaths(const char* directory);
 int findInImagePaths(FilePathList paths, char* file);
 

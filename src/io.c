@@ -47,6 +47,23 @@ ImageMetadata loadImageMetadata(Arena* imgArena, Texture2D image, const char* fi
     };
 }
 
+size_t loadFileAsBytes(const char* filepath, unsigned char** data) {
+    FILE* f = fopen(filepath, "rb");
+    fseek(f, 0, SEEK_END);
+    long fsize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    *data = malloc(fsize);
+    if (!*data) {
+        fprintf(stderr, "Failed to allocate %lu bytes of data while loading %s\n", fsize, filepath);
+        exit(-1);
+    }
+    fread(*data, fsize, 1, f);
+    fclose(f);
+
+    return fsize;
+}
+
 FilePathList getImagePaths(const char* directory) {
     FilePathList files = LoadDirectoryFilesEx(directory, IMAGE_TYPES, false);
     sortAlNumCaseInsensitive(files.paths, files.count);
