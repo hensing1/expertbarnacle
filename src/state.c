@@ -14,7 +14,7 @@ ApplicationState initAppState(char* imagePath) {
     ApplicationState s = {};
 
     s.pointerDraggingState = POINTER_DEFAULT;
-    s.isSidebarOpen = false;
+    s.sidebarState = SIDEBAR_NONE;
     s.sidebarWidth = 400;
 
     s.imgFilesInDir = getImagePaths(fileDir);
@@ -182,14 +182,16 @@ void setImageUiOpacity(ApplicationState* state, InputInfo inputs) {
         TO_RAYLIB(Clay_GetElementData(Clay_GetElementId(mkClayString("ImageContainer"))).boundingBox);
 
     // TODO: keep visibility if currently hovering over an image UI button
+
+    bool isSidebarOpen = state->sidebarState != SIDEBAR_NONE;
     if (!IsCursorOnScreen() || !CheckCollisionPointRec(inputs.mousePos, imgViewport) || 
-            (state->isSidebarOpen == wasSidebarOpen && 
+            (isSidebarOpen == wasSidebarOpen && 
              inputs.mouseDelta.x == 0 && inputs.mouseDelta.y == 0 && state->imageRenderParams.zoomSpeed == 0)) {
         timeSinceLastUiInteraction += inputs.deltaTime;
     }
     else {
         timeSinceLastUiInteraction = 0;
-        wasSidebarOpen = state->isSidebarOpen;
+        wasSidebarOpen = isSidebarOpen;
     }
     state->isImageUiVisible = timeSinceLastUiInteraction < 2.f;
 }
@@ -230,7 +232,10 @@ void updateState(ApplicationState *state, InputInfo inputs) {
         nextImage(state);
     }
     if (isButtonPressed(inputs, "InfoSidebarButton") || IsKeyPressed(KEY_I)) {
-        state->isSidebarOpen ^= true;
+        state->sidebarState = state->sidebarState == SIDEBAR_IMAGE_INFO ? SIDEBAR_NONE : SIDEBAR_IMAGE_INFO;
+    }
+    if (IsKeyPressed(KEY_S)) {
+        state->sidebarState = state->sidebarState == SIDEBAR_SETTINGS ? SIDEBAR_NONE : SIDEBAR_SETTINGS;
     }
     // -- </UI navigation>
 
@@ -271,10 +276,11 @@ void updateState(ApplicationState *state, InputInfo inputs) {
     setImageUiOpacity(state, inputs);
 
     // -- <updating pointer> --
-    if (state->isSidebarOpen && isButtonPressed(inputs, "InfoSidebarHandle")) {
+    bool isSidebarOpen = state->sidebarState != SIDEBAR_NONE;
+    if (isSidebarOpen && isButtonPressed(inputs, "InfoSidebarHandle")) {
         state->pointerDraggingState = POINTER_DRAGGING_SIDEBAR;
     }
-    else if (state->isSidebarOpen && isButtonHovered(inputs, "InfoSidebarHandle")) {
+    else if (isSidebarOpen && isButtonHovered(inputs, "InfoSidebarHandle")) {
         state->pointerDraggingState = POINTER_HOVERING_SIDEBAR;
     }
     else if (!inputs.mouseLeftDown) {

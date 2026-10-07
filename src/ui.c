@@ -107,19 +107,19 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                     CHANGE_ALPHA(C_SLATE, overlayAlpha),
                 .transition = overlayTransition
             }) {
-                CLAY_TEXT(state.isSidebarOpen ? strings[STR_INFO_OPEN]: strings[STR_INFO_CLOSED],
+                CLAY_TEXT(state.sidebarState == SIDEBAR_IMAGE_INFO ? strings[STR_INFO_OPEN]: strings[STR_INFO_CLOSED],
                     { .textColor = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha), .fontId = 0, .fontSize = 28 });
             }
         }
        
         CLAY(CLAY_ID("InfoSidebar"), {
-            .layout = { .sizing = {CLAY_SIZING_FIXED(state.isSidebarOpen ? state.sidebarWidth : 0), CLAY_SIZING_GROW()},
+            .layout = { .sizing = {CLAY_SIZING_FIXED(state.sidebarState != SIDEBAR_NONE ? state.sidebarWidth : 0), CLAY_SIZING_GROW()},
                         .padding = {3, 0, 0, 0} },
             .transition = { .handler = Clay_EaseOut,
                             .duration = state.pointerDraggingState == POINTER_DRAGGING_SIDEBAR ? 0.f : .3f,
                             .properties = CLAY_TRANSITION_PROPERTY_WIDTH }
         }) {
-            if (state.isSidebarOpen) {
+            if (state.sidebarState != SIDEBAR_NONE) {
                 CLAY(CLAY_ID("InfoSidebarHandle"), {
                     .layout = { .sizing = {CLAY_SIZING_FIXED(16), CLAY_SIZING_GROW()}},
                     .backgroundColor = {30, 29, 36, 255}
@@ -131,14 +131,20 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                                 .childGap = 16},
                     .backgroundColor = {30, 29, 36, 255}
                 }) {
-                    infoBox(CLAY_STRING("InfoSidebarBox"), 1, strings[STR_RESOLUTION_TITLE], strings[STR_RESOLUTION]);
-                    infoBox(CLAY_STRING("InfoSidebarBox"), 2, strings[STR_FILESIZE_TITLE], strings[STR_FILESIZE]);
-                    infoBox(CLAY_STRING("InfoSidebarBox"), 3, strings[STR_TIME_MODIFIED_TITLE], strings[STR_TIME_MODIFIED]);
-                    CLAY(CLAY_ID("InfoSidebarBalloon"), { 
-                        .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} }
-                    });
+                    switch (state.sidebarState) {
+                    case SIDEBAR_IMAGE_INFO:
+                        infoBox(CLAY_STRING("InfoSidebarBox"), 1, strings[STR_RESOLUTION_TITLE], strings[STR_RESOLUTION]);
+                        infoBox(CLAY_STRING("InfoSidebarBox"), 2, strings[STR_FILESIZE_TITLE], strings[STR_FILESIZE]);
+                        infoBox(CLAY_STRING("InfoSidebarBox"), 3, strings[STR_TIME_MODIFIED_TITLE], strings[STR_TIME_MODIFIED]);
+                        break;
+                    case SIDEBAR_SETTINGS:
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
+
         }
     }
     return Clay_EndLayout(inputs.deltaTime);

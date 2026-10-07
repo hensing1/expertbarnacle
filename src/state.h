@@ -14,6 +14,12 @@ typedef enum {
     POINTER_DRAGGING_SIDEBAR
 } PointerState;
 
+typedef enum {
+    SIDEBAR_NONE,
+    SIDEBAR_IMAGE_INFO,
+    SIDEBAR_SETTINGS
+} SidebarState;
+
 typedef struct {
     float zoom;
     float zoomSpeed;
@@ -25,7 +31,7 @@ typedef struct {
 
 typedef struct {
     PointerState pointerDraggingState;
-    bool isSidebarOpen;
+    SidebarState sidebarState;
     bool isImageUiVisible;
     int sidebarWidth;
     FilePathList imgFilesInDir;
