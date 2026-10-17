@@ -14,16 +14,14 @@ typedef enum {
 } Languages;
 
 typedef enum {
-    STR_INFO_OPEN,
-    STR_INFO_CLOSED,
     STR_RESOLUTION_TITLE,
     STR_RESOLUTION,
     STR_FILESIZE_TITLE,
     STR_FILESIZE,
     STR_TIME_MODIFIED_TITLE,
     STR_TIME_MODIFIED,
-    NUM_APPL_STRINGS
-} ApplicationStrings;
+    NUM_IMG_STRINGS
+} ImageStrings;
 
 void initLocale();
 

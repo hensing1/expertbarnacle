@@ -19,7 +19,7 @@ OBJ_FILES = $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(ALL_SRC)))
 all: $(TARGET)
 
 # For `make debug`
-debug: CFLAGS = -std=gnu11 -Wall -g -fsanitize=address -DDEBUG
+debug: CFLAGS = -std=gnu11 -Wall -g -DDEBUG -fsanitize=address
 debug: $(TARGET)
 
 # Create build directory if it doesn't exist

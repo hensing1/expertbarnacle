@@ -13,12 +13,9 @@ void initLocale() {
 }
 
 Clay_String* makeImageStrings(Arena* imgArena, Languages lang, ImageMetadata img) {
-    Clay_String* s = arena_alloc(imgArena, sizeof(Clay_String) * NUM_APPL_STRINGS);
+    Clay_String* s = arena_alloc(imgArena, sizeof(Clay_String) * NUM_IMG_STRINGS);
     switch(lang) {
     case LANG_DE:
-        s[STR_INFO_OPEN] = CLAY_STRING("[i]nfo >");
-        s[STR_INFO_CLOSED] = CLAY_STRING("[i]nfo <");
-
         s[STR_RESOLUTION_TITLE] = CLAY_STRING("Auflösung");
         s[STR_RESOLUTION] = fmtClayString(imgArena, "%d x %d", img.width, img.height);
         s[STR_FILESIZE_TITLE] = CLAY_STRING("Dateigröße");
@@ -30,7 +27,7 @@ Clay_String* makeImageStrings(Arena* imgArena, Languages lang, ImageMetadata img
 }
 
 void freeApplicationStrings(Clay_String* s) {
-    for (size_t i = 0; i < NUM_APPL_STRINGS; i++) {
+    for (size_t i = 0; i < NUM_IMG_STRINGS; i++) {
         if (!s[i].isStaticallyAllocated) {free((void*)s[i].chars);}
     }
     free(s);

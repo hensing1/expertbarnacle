@@ -10,8 +10,9 @@
 
 ApplicationState initAppState(char* imagePath) {
     const char* fileDir = GetDirectoryPath(imagePath);
-    int monitor = GetCurrentMonitor();
     ApplicationState s = {};
+
+    s.scale = 1.f;
 
     s.pointerDraggingState = POINTER_DEFAULT;
     s.sidebarState = SIDEBAR_NONE;
@@ -40,9 +41,9 @@ static inline bool isButtonPressed(InputInfo inputs, const char* elementName) {
     return inputs.mouseLeftPressed && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
 }
 
-static inline bool isButtonHeld(InputInfo inputs, const char* elementName) {
-    return inputs.mouseLeftDown && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
-}
+// static inline bool isButtonHeld(InputInfo inputs, const char* elementName) {
+//     return inputs.mouseLeftDown && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
+// }
 
 static inline bool isButtonHovered(InputInfo inputs, const char* elementName) {
     return !inputs.mouseLeftDown && Clay_PointerOver(Clay_GetElementId(mkClayString(elementName)));
@@ -95,11 +96,11 @@ static void updateMainImageParams(ApplicationState* state, InputInfo inputs) {
 
     float vpAspectRatio = viewport.width / viewport.height;
     float imgAspectRatio = (float)tex.width / tex.height;
-    float zoomConversion = 
+    float zoomConversion =
         vpAspectRatio > imgAspectRatio ?
             viewport.height / tex.height :
             viewport.width / tex.width;
-    
+
     // "1x zoom" means image fills whole viewport -> need to express zoom in terms of
     // enlarging/shrinking the image to fit the box
     float absZoom = params->zoom * zoomConversion;
@@ -135,7 +136,7 @@ static void updateMainImageParams(ApplicationState* state, InputInfo inputs) {
 
     virtImgCrop.x = clamp(virtImgCrop.x, 0, virtImgSize.width - virtImgCrop.width);
     virtImgCrop.y = clamp(virtImgCrop.y, 0, virtImgSize.height - virtImgCrop.height);
-    
+
     params->imageCrop = (Rectangle){
         .width =
             virtImgSize.width > viewport.width ?
@@ -177,15 +178,15 @@ void updatePointer(PointerState pointerState) {
 void setImageUiOpacity(ApplicationState* state, InputInfo inputs) {
     static float timeSinceLastUiInteraction = 0;
     static bool wasSidebarOpen = false;
-    
-    Rectangle imgViewport = 
+
+    Rectangle imgViewport =
         TO_RAYLIB(Clay_GetElementData(Clay_GetElementId(mkClayString("ImageContainer"))).boundingBox);
 
     // TODO: keep visibility if currently hovering over an image UI button
 
     bool isSidebarOpen = state->sidebarState != SIDEBAR_NONE;
-    if (!IsCursorOnScreen() || !CheckCollisionPointRec(inputs.mousePos, imgViewport) || 
-            (isSidebarOpen == wasSidebarOpen && 
+    if (!IsCursorOnScreen() || !CheckCollisionPointRec(inputs.mousePos, imgViewport) ||
+            (isSidebarOpen == wasSidebarOpen &&
              inputs.mouseDelta.x == 0 && inputs.mouseDelta.y == 0 && state->imageRenderParams.zoomSpeed == 0)) {
         timeSinceLastUiInteraction += inputs.deltaTime;
     }

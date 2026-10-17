@@ -1,11 +1,11 @@
 #include "renderer.h"
 
 #include <math.h>
+#include <raylib.h>
 #include <string.h>
 
 #include "fonts.h"
 #include "state.h"
-#include "ui.h"
 #include "util.h"
 
 const char* overlayShaderCode = "#version 330\n"
@@ -57,8 +57,10 @@ void DisableColorOverlay() {
 }
 
 Shader imageShader;
-void initImageShader() {
-    imageShader = LoadShader(0, "src/shaders/image.frag");
+Shader iconShader;
+void initShaders() {
+    imageShader = LoadShader(NULL, "src/shaders/image.frag");
+    iconShader = LoadShader(NULL, "src/shaders/icon.frag");
 }
 
 static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_TextElementConfig *config, void *userData) {
@@ -73,7 +75,7 @@ static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_Tex
     float textHeight = config->fontSize;
     Font fontToUse = getFont(config->fontSize);
     // Font failed to load, likely the fonts are in the wrong place relative to the execution dir.
-    // RayLib ships with a default font, so we can continue with that built in one. 
+    // RayLib ships with a default font, so we can continue with that built in one.
     if (!fontToUse.glyphs) {
         fontToUse = GetFontDefault();
     }
@@ -142,21 +144,21 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands)
             case CLAY_RENDER_COMMAND_TYPE_TEXT: {
                 Clay_TextRenderData *textData = &renderCommand->renderData.text;
                 Font fontToUse = getFont(textData->fontSize);
-    
+
                 int strlen = textData->stringContents.length + 1;
-    
+
                 if(strlen > temp_render_buffer_len) {
                     // Grow the temp buffer if we need a larger string
                     if(temp_render_buffer) free(temp_render_buffer);
                     temp_render_buffer = (char *) malloc(strlen);
                     temp_render_buffer_len = strlen;
                 }
-    
+
                 // Raylib uses standard C strings so isn't compatible with cheap slices, we need to clone the string to append null terminator
                 memcpy(temp_render_buffer, textData->stringContents.chars, textData->stringContents.length);
                 temp_render_buffer[textData->stringContents.length] = '\0';
                 DrawTextEx(fontToUse, temp_render_buffer, (Vector2){boundingBox.x, boundingBox.y}, (float)textData->fontSize, (float)textData->letterSpacing, TO_RAYLIB(textData->textColor));
-    
+
                 break;
             }
             case CLAY_RENDER_COMMAND_TYPE_IMAGE: {
@@ -236,20 +238,44 @@ void Clay_Raylib_Render(Clay_RenderCommandArray renderCommands)
                 CustomLayoutElement *customElement = (CustomLayoutElement *)config->customData;
                 if (!customElement) continue;
                 switch (customElement->type) {
-                    case CUSTOM_LAYOUT_ELEMENT_TYPE_MAINIMAGE:
+                    case CUSTOM_LAYOUT_ELEMENT_TYPE_MAINIMAGE: {
+                        RenderData_MainImage renderData = customElement->customData.imageRenderData;
                         BeginShaderMode(imageShader);
                         {
                             DrawTexturePro(
-                                customElement->customData.imageRenderData.image,
-                                customElement->customData.imageRenderData.imageRenderParams.imageCrop,
-                                customElement->customData.imageRenderData.imageRenderParams.imageTarget,
+                                renderData.image,
+                                renderData.imageRenderParams.imageCrop,
+                                renderData.imageRenderParams.imageTarget,
                                 (Vector2){0, 0},
                                 0,
-                                RED
+                                WHITE
                             );
                         }
                         EndShaderMode();
                         break;
+                    }
+                    case CUSTOM_LAYOUT_ELEMENT_TYPE_ICON: {
+                        RenderData_Icon renderData = customElement->customData.iconRenderData;
+                        int foregroundColorLoc = GetShaderLocation(iconShader, "foregroundColor");
+                        int backgroundColorLoc = GetShaderLocation(iconShader, "backgroundColor");
+                        SetShaderValue(iconShader, foregroundColorLoc,
+                            (Color*)&customElement->customData.iconRenderData.foregroundColor, SHADER_UNIFORM_VEC4);
+                        SetShaderValue(iconShader, backgroundColorLoc,
+                            (Color*)&customElement->customData.iconRenderData.backgroundColor, SHADER_UNIFORM_VEC4);
+                        BeginShaderMode(iconShader);
+                        {
+                            DrawTexturePro(
+                                *renderData.iconTexture,
+                                (Rectangle){.x=0, .y=0, .width=renderData.iconTexture->width, .height=renderData.iconTexture->height},
+                                TO_RAYLIB(boundingBox),
+                                (Vector2){0, 0},
+                                0,
+                                WHITE
+                            );
+                        }
+                        EndShaderMode();
+                        break;
+                    }
                     default: break;
                 }
                 break;

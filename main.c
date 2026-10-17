@@ -10,6 +10,7 @@
 #include "src/io.h"
 #include "src/renderer.h"
 #include "src/state.h"
+#include "src/textures.h"
 #include "src/ui.h"
 #include "src/util.h"
 
@@ -36,7 +37,10 @@ int main(int argc, char* argv[]) {
     SetWindowState(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
     SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-    initImageShader();
+    initShaders();
+    initIcons();
+    char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-400-normal.ttf";
+    initFont(fontFile);
 
     // initialize clay
     uint64_t clayArenaSize = Clay_MinMemorySize();
@@ -48,10 +52,6 @@ int main(int argc, char* argv[]) {
     );
     Clay__debugViewWidth = 600;
 
-    char* fontFile = "./res/fonts/adwaita-sans/static/adwaita-sans-latin-400-normal.ttf";
-    // char* fontFile = "./res/fonts/Libron/Libron-Regular.ttf";
-    // char* fontFile = "./res/fonts/ia-writer-quattro/ia-writer-quattro-latin-400-normal.ttf";
-    initFont(fontFile);
     Clay_Raylib_Initialize(NULL);
 
     initLocale();
@@ -74,6 +74,7 @@ int main(int argc, char* argv[]) {
     }
 
     freeImage(state.currentImage);
+    UnloadDirectoryFiles(state.imgFilesInDir);
     CloseWindow();
     Clay_Raylib_Close();
     return 0;
@@ -113,4 +114,3 @@ Vector2 getInitWindowDimensions(char* imagePath) {
 void handleClayErrors(Clay_ErrorData errors) {
     fprintf(stderr, "Clay Error: %s\n", errors.errorText.chars);
 }
-

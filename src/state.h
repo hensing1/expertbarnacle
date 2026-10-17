@@ -30,6 +30,7 @@ typedef struct {
 } RenderParams_MainImage;
 
 typedef struct {
+    float scale;
     PointerState pointerDraggingState;
     SidebarState sidebarState;
     bool isImageUiVisible;
