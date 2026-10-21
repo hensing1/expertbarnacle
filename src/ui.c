@@ -10,9 +10,13 @@
 #include "textures.h"
 #include "util.h"
 
+const Clay_TransitionElementConfig noTransition = {0};
+
 Clay_Vector2 convVec2RaylibClay(Vector2 vec) {return (Clay_Vector2){vec.x, vec.y};}
 
-void icon(Arena* frameArena, const char* id, IconID icon, Clay_Color foreground, Clay_Color background, float height) {
+void icon(Arena* frameArena, const char* id, IconID icon,
+          Clay_Color foreground, Clay_Color background,
+          Clay_TransitionElementConfig transition, int height) {
     Texture2D* iconTex = getIcon(icon);
     float aspectRatio = (float)iconTex->width / iconTex->height;
     Vector4 fg = (Vector4){.x = foreground.r / 255, .y = foreground.g / 255, .z = foreground.b / 255, .w = foreground.a / 255};
@@ -30,6 +34,7 @@ void icon(Arena* frameArena, const char* id, IconID icon, Clay_Color foreground,
         .layout = { .sizing = height > 0 ? (Clay_Sizing){ CLAY_SIZING_FIXED(aspectRatio * height), CLAY_SIZING_FIXED(height) } :
                                          (Clay_Sizing){ CLAY_SIZING_GROW(), CLAY_SIZING_GROW() } },
         .aspectRatio = { aspectRatio },
+        .transition = transition,
         .custom = { .customData = (void*)iconElement }
     });
 }
@@ -47,6 +52,10 @@ void infoBox(Clay_String id, int index, Clay_String title, Clay_String content) 
         CLAY_TEXT(title, { .textColor = C_LIGHTGRAY, .fontId = 0, .fontSize = 28 });
         CLAY_TEXT(content, { .textColor = C_WHITE, .fontId = 1, .fontSize = 32 });
     }
+}
+
+void overlay() {
+
 }
 
 void sidebar(const ApplicationState state, const InputInfo inputs, Arena* frameArena) {
@@ -88,8 +97,10 @@ void sidebar(const ApplicationState state, const InputInfo inputs, Arena* frameA
                             { .textColor = C_WHITE, .fontId = 1, .fontSize = 32 });
                     CLAY(CLAY_ID("SizeSelectorBalloon"), {
                         .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} } });
-                    icon(frameArena, "UiGrowButton", ICON_ADD, C_WHITE, (Clay_Color){0}, 32);
-                    icon(frameArena, "UiShrinkButton", ICON_REMOVE, C_WHITE, (Clay_Color){0}, 32);
+                    icon(frameArena, "UiGrowButton", ICON_ADD, C_WHITE, (Clay_Color){0},
+                         noTransition, 32);
+                    icon(frameArena, "UiShrinkButton", ICON_REMOVE, C_WHITE, (Clay_Color){0},
+                         noTransition, 32);
                 }
             }
             break;
@@ -109,8 +120,8 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
         .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} },
         .backgroundColor = C_SLATE
     }) {
-        CustomLayoutElement* custom = arena_alloc(frameArena, sizeof(CustomLayoutElement));
-        *custom = (CustomLayoutElement){
+        CustomLayoutElement* mainImageData = arena_alloc(frameArena, sizeof(CustomLayoutElement));
+        *mainImageData = (CustomLayoutElement){
             .type = CUSTOM_LAYOUT_ELEMENT_TYPE_MAINIMAGE,
             .customData.imageRenderData = {
                 .image = state.currentImage.texture,
@@ -121,7 +132,7 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
             .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()},
                         .childAlignment = { CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER },
             },
-            .custom = { .customData = custom },
+            .custom = { .customData = mainImageData },
         }) {
             float overlayAlpha = state.isImageUiVisible ? 255 : 0;
             Clay_TransitionElementConfig overlayTransition = {
@@ -130,8 +141,9 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                 .duration = state.isImageUiVisible ? 0.1f : 0.8f
             };
 
+            int buttonSize = 48;
             CLAY(CLAY_ID("NavButtonLeft"), {
-                .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)},
+                .layout = { .sizing = {CLAY_SIZING_FIXED(buttonSize), CLAY_SIZING_FIXED(buttonSize)},
                             .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER}},
                 .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
                               .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
@@ -149,22 +161,26 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                     { .textColor = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha), .fontId = 0, .fontSize = 28 });
             }
             CLAY(CLAY_ID("NavButtonRight"), {
-                .layout = { .sizing = {CLAY_SIZING_FIXED(64), CLAY_SIZING_FIXED(64)},
+                .layout = { .sizing = {CLAY_SIZING_FIXED(buttonSize), CLAY_SIZING_FIXED(buttonSize)},
                             .childAlignment = {CLAY_ALIGN_X_CENTER, CLAY_ALIGN_Y_CENTER}},
                 .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
                               .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
                               .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_CENTER,
                                                 .parent = CLAY_ATTACH_POINT_RIGHT_CENTER},
                                                 .offset.x = -32 },
-                .border = { .width = CLAY_BORDER_ALL(2),
-                            .color = CHANGE_ALPHA(C_GRAY, overlayAlpha) },
+                .cornerRadius = { 15, 15, 15, 15 },
+                // .border = { .width = CLAY_BORDER_ALL(3),
+                //             .color = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha) },
                 .backgroundColor = Clay_Hovered() ?
-                    (Clay_Color){80, 80, 80, overlayAlpha} :
-                    CHANGE_ALPHA(C_SLATE, overlayAlpha),
+                        (Clay_Color){80, 80, 80, overlayAlpha} :
+                    CHANGE_ALPHA(C_SLATE, min(overlayAlpha, 200)),
                 .transition = overlayTransition
             }) {
-                CLAY_TEXT(CLAY_STRING(">"),
-                    { .textColor = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha), .fontId = 0, .fontSize = 28 });
+                Clay_Color fg = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha);
+                icon(frameArena, "NavButtonRightIcon", ICON_CHEVRON_RIGHT,
+                     fg, (Clay_Color){0}, overlayTransition, buttonSize);
+                // CLAY_TEXT(CLAY_STRING(">"),
+                //     { .textColor = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha), .fontId = 0, .fontSize = 28 });
             }
             CLAY(CLAY_ID("InfoSidebarButton"), {
                 .layout = { .sizing = {CLAY_SIZING_FIT(), CLAY_SIZING_FIT()},

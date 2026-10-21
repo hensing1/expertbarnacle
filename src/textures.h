@@ -7,6 +7,8 @@ typedef enum {
     ICON_ADD,
     ICON_REMOVE,
     ICON_RESET,
+    ICON_CHEVRON_LEFT,
+    ICON_CHEVRON_RIGHT,
     NUM_ICONS
 } IconID;
 
