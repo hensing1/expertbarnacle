@@ -223,7 +223,35 @@ void previousImage(ApplicationState* state) {
     SetWindowTitle(state->currentImage.metadata.fileName);
 }
 
-void updateState(ApplicationState *state, InputInfo inputs) {
+static float scalePow = 0;
+void handleCtrlInputs(ApplicationState* state, InputInfo inputs) {
+    if (inputs.mouseScroll.y > 0) {
+        scalePow++;
+    }
+    else if (inputs.mouseScroll.y < 0) {
+        scalePow--;
+    }
+    if (IsKeyPressed(KEY_ZERO)) {scalePow = 0;}
+    scalePow = clamp(scalePow, -2, 8);
+    state->scale = powf(1.1f, scalePow);
+}
+
+void updateState(ApplicationState* state, InputInfo inputs) {
+    // -- <Setting changes>
+    if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)) {
+        handleCtrlInputs(state, inputs);
+        return;
+    }
+    if (isButtonPressed(inputs, "UiGrowButton")) {
+        scalePow++;
+    }
+    if (isButtonPressed(inputs, "UiShrinkButton")) {
+        scalePow--;
+    }
+    scalePow = clamp(scalePow, -2, 8);
+    state->scale = powf(1.1f, scalePow);
+    // -- </Setting changes>
+
     // -- <UI navigation>
     if ((isButtonPressed(inputs, "NavButtonLeft") || IsKeyPressed(KEY_LEFT)) && state->currentImgIndex > 0) {
         previousImage(state);
@@ -235,7 +263,7 @@ void updateState(ApplicationState *state, InputInfo inputs) {
     if (isButtonPressed(inputs, "InfoSidebarButton") || IsKeyPressed(KEY_I)) {
         state->sidebarState = state->sidebarState == SIDEBAR_IMAGE_INFO ? SIDEBAR_NONE : SIDEBAR_IMAGE_INFO;
     }
-    if (IsKeyPressed(KEY_S)) {
+    if (isButtonPressed(inputs, "SettingsSidebarButton") || IsKeyPressed(KEY_S)) {
         state->sidebarState = state->sidebarState == SIDEBAR_SETTINGS ? SIDEBAR_NONE : SIDEBAR_SETTINGS;
     }
     // -- </UI navigation>

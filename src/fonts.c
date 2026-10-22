@@ -33,7 +33,7 @@ void initFont(char* fontFilePath) {
     strcpy(font.fontDataFileType, fileType);
 
     font.minSize = 5;
-    font.maxSize = 50;
+    font.maxSize = 75;
     font.sizes = malloc(sizeof(Font) * (font.maxSize - font.minSize));
     font.fontLoaded = malloc(sizeof(bool) * (font.maxSize - font.minSize));
 
