@@ -28,6 +28,46 @@ typedef struct {
     bool mouseRightDown;
 } InputInfo;
 
+typedef enum {
+    JSON_TYPE_NULL,
+    JSON_TYPE_BOOL,
+    JSON_TYPE_NUMBER,
+    JSON_TYPE_STRING,
+    JSON_TYPE_ARRAY,
+    JSON_TYPE_OBJECT,
+    JSON_TYPE_PROPERTY
+} JsonType;
+
+typedef struct _JsonElement JsonElement;
+
+typedef struct {
+    JsonElement* elements;
+    size_t numElements;
+    size_t capacity;
+} JsonArray;
+
+typedef struct {
+    char* key;
+    JsonElement* value;
+} JsonProperty;
+
+typedef struct {
+    JsonProperty* props;
+    size_t numProps;
+    size_t capacity;
+} JsonObject;
+
+typedef struct _JsonElement {
+    JsonType type;
+    union {
+        bool boolValue;
+        float numberValue;
+        char* stringValue;
+        JsonArray arrayValue;
+        JsonObject objectValue;
+    } value;
+} JsonElement;
+
 InputInfo captureInputs();
 bool isFile(char* path);
 ImageMetadata loadImageMetadata(Arena* imgArena, Texture2D image, const char* filepath);

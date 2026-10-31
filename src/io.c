@@ -49,6 +49,10 @@ ImageMetadata loadImageMetadata(Arena* imgArena, Texture2D image, const char* fi
 
 size_t loadFileAsBytes(const char* filepath, unsigned char** data) {
     FILE* f = fopen(filepath, "rb");
+    if (!f) {
+        fprintf(stderr, "Could not open file: %s\n", filepath);
+        exit(-1);
+    }
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
     fseek(f, 0, SEEK_SET);
@@ -81,4 +85,11 @@ int findInImagePaths(FilePathList paths, char* file) {
         }
     }
     return -1;
+}
+
+
+JsonElement loadJson(char* filepath) {
+    unsigned char* bytes;
+    size_t filesize = loadFileAsBytes(filepath, &bytes);
+
 }

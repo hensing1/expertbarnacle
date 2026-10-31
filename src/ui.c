@@ -105,10 +105,10 @@ void sidebar(const ApplicationState state, const InputInfo inputs, Arena* frameA
                 }) {
                     CLAY_TEXT(fmtClayString(frameArena, "%.2f", state.scale),
                             { .textColor = C_WHITE, .fontId = 1, .fontSize = 32 * s });
-                    CLAY(CLAY_ID("SizeSelectorBalloon"), {
-                        .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} } });
+                    CLAY_AUTO_ID({ .layout = { .sizing = {CLAY_SIZING_GROW(), CLAY_SIZING_GROW()} } });
                     icon(frameArena, "UiGrowButton", ICON_ADD, C_LIGHTGRAY, C_WHITE, (Clay_Color){0},
                          noTransition, 32 * s);
+                    CLAY_AUTO_ID({ .layout = { .sizing = {CLAY_SIZING_FIXED(8*s), CLAY_SIZING_GROW()} } });
                     icon(frameArena, "UiShrinkButton", ICON_REMOVE, C_LIGHTGRAY, C_WHITE, (Clay_Color){0},
                          noTransition, 32 * s);
                 }
@@ -201,6 +201,7 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                 //     { .textColor = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha), .fontId = 0, .fontSize = 28 });
             }
 
+            float sidebarButtonAlpha = state.sidebarState != SIDEBAR_NONE ? 255 : overlayAlpha;
             bool infoOpen = state.sidebarState == SIDEBAR_IMAGE_INFO;
             CLAY(CLAY_ID("InfoSidebarButton"), {
                 .layout = { .sizing = {CLAY_SIZING_FIT(), CLAY_SIZING_FIT()},
@@ -209,25 +210,25 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                               .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
                               .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_TOP,
                                                 .parent = CLAY_ATTACH_POINT_RIGHT_TOP},
-                                                .offset = {-16 * s, 16 * s} },
+                                                .offset = {-8 * s, 8 * s} },
                 .cornerRadius = navButtonRadius,
                 .border = { .width = CLAY_BORDER_OUTSIDE(3 * s),
                             .color = infoOpen ?
-                                        CHANGE_ALPHA(C_WHITE, overlayAlpha) :
-                                        CHANGE_ALPHA(C_GRAY, overlayAlpha)},
+                                        CHANGE_ALPHA(C_WHITE, sidebarButtonAlpha) :
+                                        CHANGE_ALPHA(C_GRAY, sidebarButtonAlpha)},
                 .backgroundColor = Clay_Hovered() ?
-                    (Clay_Color){80, 80, 80, overlayAlpha} :
-                    CHANGE_ALPHA(C_SLATE, overlayAlpha),
+                    (Clay_Color){80, 80, 80, sidebarButtonAlpha} :
+                    CHANGE_ALPHA(C_SLATE, sidebarButtonAlpha),
                 .transition = overlayTransition
             }) {
                 // CLAY_TEXT(state.sidebarState == SIDEBAR_IMAGE_INFO ? mkClayString("[i]nfo >"): mkClayString("[i]nfo <"),
-                //     { .textColor = CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha), .fontId = 0, .fontSize = 28 * s });
+                //     { .textColor = CHANGE_ALPHA(C_LIGHTGRAY, sidebarButtonAlpha), .fontId = 0, .fontSize = 28 * s });
                 Clay_Color infoFg = infoOpen ?
-                                        CHANGE_ALPHA(C_WHITE, overlayAlpha) :
-                                        CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha);
-                icon(frameArena, "infoIcon", ICON_INFO, infoFg, infoFg, (Clay_Color){}, overlayTransition, 40 * s);
+                                        CHANGE_ALPHA(C_WHITE, sidebarButtonAlpha) :
+                                        CHANGE_ALPHA(C_LIGHTGRAY, sidebarButtonAlpha);
+                icon(frameArena, "infoIcon", ICON_INFO, infoFg, infoFg, (Clay_Color){}, overlayTransition, 32 * s);
                 icon(frameArena, "infoOpenIcon", infoOpen ? ICON_CHEVRON_RIGHT : ICON_CHEVRON_LEFT,
-                     infoFg, infoFg, (Clay_Color){}, overlayTransition, 40 * s);
+                     infoFg, infoFg, (Clay_Color){}, overlayTransition, 32 * s);
             }
             bool settingsOpen = state.sidebarState == SIDEBAR_SETTINGS;
             CLAY(CLAY_ID("SettingsSidebarButton"), {
@@ -235,25 +236,25 @@ Clay_RenderCommandArray createUI(const ApplicationState state, const InputInfo i
                             .padding = CLAY_PADDING_ALL(8 * s)},
                 .floating = { .attachTo = CLAY_ATTACH_TO_PARENT,
                               .pointerCaptureMode = CLAY_POINTER_CAPTURE_MODE_PASSTHROUGH,
-                              .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_BOTTOM,
-                                                .parent = CLAY_ATTACH_POINT_RIGHT_BOTTOM},
-                                                .offset = {-16 * s, -16 * s} },
+                              .attachPoints = { .element = CLAY_ATTACH_POINT_RIGHT_TOP,
+                                                .parent = CLAY_ATTACH_POINT_RIGHT_TOP},
+                                                .offset = {-8 * s, 64 * s} },
                 .cornerRadius = navButtonRadius,
                 .border = { .width = CLAY_BORDER_OUTSIDE(3 * s),
                             .color = settingsOpen ?
-                                        CHANGE_ALPHA(C_WHITE, overlayAlpha) :
-                                        CHANGE_ALPHA(C_GRAY, overlayAlpha)},
+                                        CHANGE_ALPHA(C_WHITE, sidebarButtonAlpha) :
+                                        CHANGE_ALPHA(C_GRAY, sidebarButtonAlpha)},
                 .backgroundColor = Clay_Hovered() ?
-                    (Clay_Color){80, 80, 80, overlayAlpha} :
-                    CHANGE_ALPHA(C_SLATE, overlayAlpha),
+                    (Clay_Color){80, 80, 80, sidebarButtonAlpha} :
+                    CHANGE_ALPHA(C_SLATE, sidebarButtonAlpha),
                 .transition = overlayTransition
             }) {
                 Clay_Color settingsFg = settingsOpen ?
-                                            CHANGE_ALPHA(C_WHITE, overlayAlpha) :
-                                            CHANGE_ALPHA(C_LIGHTGRAY, overlayAlpha);
-                icon(frameArena, "settingsIcon", ICON_SETTINGS, settingsFg, settingsFg, (Clay_Color){}, overlayTransition, 40 * s);
+                                            CHANGE_ALPHA(C_WHITE, sidebarButtonAlpha) :
+                                            CHANGE_ALPHA(C_LIGHTGRAY, sidebarButtonAlpha);
+                icon(frameArena, "settingsIcon", ICON_SETTINGS, settingsFg, settingsFg, (Clay_Color){}, overlayTransition, 32 * s);
                 icon(frameArena, "settingsOpenIcon", state.sidebarState == SIDEBAR_SETTINGS ? ICON_CHEVRON_RIGHT : ICON_CHEVRON_LEFT,
-                     settingsFg, settingsFg, (Clay_Color){}, overlayTransition, 40 * s);
+                     settingsFg, settingsFg, (Clay_Color){}, overlayTransition, 32 * s);
             }
         }
 

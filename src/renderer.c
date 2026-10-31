@@ -59,8 +59,8 @@ void DisableColorOverlay() {
 Shader imageShader;
 Shader iconShader;
 void initShaders() {
-    imageShader = LoadShader(NULL, "src/shaders/image.frag");
-    iconShader = LoadShader(NULL, "src/shaders/icon.frag");
+    imageShader = LoadShader(NULL, "./shaders/image.frag");
+    iconShader  = LoadShader(NULL, "./shaders/icon.frag");
 }
 
 static inline Clay_Dimensions Raylib_MeasureText(Clay_StringSlice text, Clay_TextElementConfig *config, void *userData) {
